@@ -1,3 +1,7 @@
+mod app;
+mod cli;
+
 fn main() {
-    println!("Goodbye, world!");
+    let app = app::App {};
+    app.run();
 }

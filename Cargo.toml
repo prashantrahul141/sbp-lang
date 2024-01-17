@@ -1,5 +1,5 @@
 [package]
-name = "ll-lang"
+name = "sbp-lang"
 version = "0.1.0"
 edition = "2021"
 

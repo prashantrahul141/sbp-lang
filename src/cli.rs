@@ -2,7 +2,7 @@ use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
-#[command(name="ll-lang", about="A learning programming language.", long_about = None)]
+#[command(name="sbp-lang", about="A learning programming language.", long_about = None)]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
