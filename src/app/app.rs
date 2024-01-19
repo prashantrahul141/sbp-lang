@@ -12,15 +12,22 @@ impl App {
         App::set_logging_level(LevelFilter::All);
 
         // parsing cli args.
+        spdlog::debug!("parsing cli");
         let cli_args = Cli::parse();
 
         // calling App's required method according to option used in cli.
         match cli_args.command {
             // compile.
-            cli::Commands::Compile { filepath } => App::compile(&filepath),
+            cli::Commands::Compile { filepath } => {
+                spdlog::debug!("compile command was invoked");
+                App::compile(&filepath)
+            }
 
             // docs.
-            cli::Commands::Docs { query } => App::docs(&query),
+            cli::Commands::Docs { query } => {
+                spdlog::debug!("docs command was invoked");
+                App::docs(&query)
+            }
         }
     }
 }
