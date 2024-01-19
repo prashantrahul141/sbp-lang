@@ -9,12 +9,20 @@ pub struct Cli {
 }
 
 #[derive(Debug, Subcommand)]
-pub(crate) enum Commands {
+pub enum Commands {
     // file path to compile
     #[command(arg_required_else_help = true)]
     #[command(about = "Compile a file")]
     Compile {
         #[arg(required = true)]
         filepath: PathBuf,
+    },
+
+    // see docs for a query.
+    #[command(arg_required_else_help = true)]
+    #[command(about = "See docs.")]
+    Docs {
+        #[arg(required = false)]
+        query: String,
     },
 }
