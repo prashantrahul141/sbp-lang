@@ -10,8 +10,13 @@ pub struct Cli {
 
 #[derive(Debug, Subcommand)]
 pub enum Commands {
+    // repl
+    #[command()]
+    #[command(about = "Interactive repl")]
+    Repl,
+
     // file path to compile
-    #[command(arg_required_else_help = true)]
+    #[command()]
     #[command(about = "Compile a file")]
     Compile {
         #[arg(required = true)]
@@ -19,10 +24,7 @@ pub enum Commands {
     },
 
     // see docs for a query.
-    #[command(arg_required_else_help = true)]
-    #[command(about = "See docs.")]
-    Docs {
-        #[arg(required = false)]
-        query: String,
-    },
+    #[command()]
+    #[command(about = "See docs")]
+    Docs,
 }

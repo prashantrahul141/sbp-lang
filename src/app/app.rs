@@ -17,16 +17,21 @@ impl App {
 
         // calling App's required method according to option used in cli.
         match cli_args.command {
+            // repl
+            cli::Commands::Repl => {
+                spdlog::debug!("repl command was invoked.");
+            }
+
             // compile.
             cli::Commands::Compile { filepath } => {
                 spdlog::debug!("compile command was invoked");
-                App::compile(&filepath)
+                App::compile_file(&filepath);
             }
 
             // docs.
-            cli::Commands::Docs { query } => {
+            cli::Commands::Docs => {
                 spdlog::debug!("docs command was invoked");
-                App::docs(&query)
+                App::docs();
             }
         }
     }

@@ -1,12 +1,11 @@
-use spdlog::{debug, error, trace};
-
 use super::app::App;
+use spdlog::{debug, error, trace};
 use std::{fs, path::PathBuf, process::exit};
 
 impl App {
-    /// top level compile function.
-    /// this handles calling all steps required for compilation.
-    pub fn compile(filepath: &PathBuf) {
+    /// compile function for files.
+    /// this is a wrapper for compile function.
+    pub fn compile_file(filepath: &PathBuf) {
         // checking for existence of file.
         if !filepath.exists() {
             error!(
@@ -18,11 +17,11 @@ impl App {
 
         // reading file contents.
         debug!("Reading file contents : {}", filepath.to_str().unwrap());
-        let mut file_contents: String;
+        let file_contents: String;
         match fs::read_to_string(filepath) {
             Ok(file) => {
                 debug!("successfully read file contents.");
-                trace!("contents of the file : {}", file);
+                trace!("contents of the file : \n{}", file);
                 file_contents = file;
             }
             Err(err) => {
@@ -31,6 +30,6 @@ impl App {
             }
         }
 
-        // lexical analysis.
+        App::compile(&file_contents);
     }
 }

@@ -1,9 +1,10 @@
 mod cli;
 mod app {
     pub mod app;
-    mod app_compile;
-    mod app_docs;
-    mod app_utils;
+    mod compile;
+    mod compile_file;
+    mod docs;
+    mod utils;
 }
 
 fn main() {
