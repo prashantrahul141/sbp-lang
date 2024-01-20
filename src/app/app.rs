@@ -4,10 +4,17 @@ use spdlog::LevelFilter;
 
 /// Top level app.
 /// this holds the implementation for calling all requied top level methods when called from cli.
-pub struct App;
+pub struct App {
+    pub has_error: bool,
+}
 
 impl App {
-    pub fn run() {
+    // create new instance
+    pub fn new() -> Self {
+        return Self { has_error: false };
+    }
+
+    pub fn run(&mut self) {
         // setup logging.
         App::set_logging_level(LevelFilter::All);
 
@@ -20,12 +27,13 @@ impl App {
             // repl
             cli::Commands::Repl => {
                 spdlog::debug!("repl command was invoked.");
+                self.repl();
             }
 
             // compile.
             cli::Commands::Compile { filepath } => {
                 spdlog::debug!("compile command was invoked");
-                App::compile_file(&filepath);
+                self.compile_file(&filepath);
             }
 
             // docs.

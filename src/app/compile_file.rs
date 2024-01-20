@@ -5,7 +5,7 @@ use std::{fs, path::PathBuf, process::exit};
 impl App {
     /// compile function for files.
     /// this is a wrapper for compile function.
-    pub fn compile_file(filepath: &PathBuf) {
+    pub fn compile_file(&self, filepath: &PathBuf) {
         // checking for existence of file.
         if !filepath.exists() {
             error!(
@@ -30,6 +30,10 @@ impl App {
             }
         }
 
-        App::compile(&file_contents);
+        self.compile(&file_contents);
+
+        if self.has_error {
+            panic!("Has some error idk");
+        }
     }
 }
