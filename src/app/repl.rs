@@ -21,7 +21,7 @@ impl App {
                     }
 
                     // else compile and run the line.
-                    self.compile(&source);
+                    self.compile(source);
                 }
                 // incase of failing to read line.
                 Err(err) => {

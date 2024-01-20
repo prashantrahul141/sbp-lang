@@ -29,7 +29,7 @@ impl App {
             }
         };
 
-        self.compile(&file_contents);
+        self.compile(file_contents);
 
         if self.has_error {
             panic!("Has some error idk");
