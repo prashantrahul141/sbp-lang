@@ -1,6 +1,5 @@
 use crate::cli::{self, Cli};
 use clap::Parser;
-use spdlog::LevelFilter;
 
 /// Top level app.
 /// this holds the implementation for calling all requied top level methods when called from cli.
@@ -16,7 +15,6 @@ impl App {
 
     pub fn run(&mut self) {
         // setup logging.
-        App::set_logging_level(LevelFilter::All);
 
         // parsing cli args.
         spdlog::debug!("parsing cli");

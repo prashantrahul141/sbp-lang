@@ -1,8 +1,5 @@
-use std::borrow::Borrow;
-
-use crate::token::{token_main::Token, token_main::TokenLiterals, token_types::TokenType};
-
 use super::lexer_main::Lexer;
+use crate::token::{token_main::Token, token_main::TokenLiterals, token_types::TokenType};
 
 impl Lexer {
     // function to consume next char.
