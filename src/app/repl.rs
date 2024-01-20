@@ -1,5 +1,4 @@
-use super::app::App;
-use spdlog;
+use super::app_main::App;
 use std::io::{self, stdout, Write};
 
 impl App {

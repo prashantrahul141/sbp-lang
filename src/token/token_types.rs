@@ -53,6 +53,6 @@ pub enum TokenType {
 // using debug macro to generate display fmt and then use that as its actual implementation.
 impl std::fmt::Display for TokenType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{:?}", self);
+        write!(f, "{:?}", self)
     }
 }

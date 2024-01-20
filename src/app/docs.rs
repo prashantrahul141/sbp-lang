@@ -1,6 +1,4 @@
-use spdlog;
-
-use super::app::App;
+use super::app_main::App;
 
 impl App {
     pub fn docs() {

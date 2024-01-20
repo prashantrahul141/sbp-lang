@@ -1,4 +1,4 @@
-use super::app::App;
+use super::app_main::App;
 use spdlog::{debug, error, trace};
 use std::{fs, path::PathBuf, process::exit};
 
@@ -17,18 +17,17 @@ impl App {
 
         // reading file contents.
         debug!("Reading file contents : {}", filepath.to_str().unwrap());
-        let file_contents: String;
-        match fs::read_to_string(filepath) {
+        let file_contents: String = match fs::read_to_string(filepath) {
             Ok(file) => {
                 debug!("successfully read file contents.");
                 trace!("contents of the file : \n{}", file);
-                file_contents = file;
+                file
             }
             Err(err) => {
                 error!("failed to read file because {}", err.to_string());
                 exit(1);
             }
-        }
+        };
 
         self.compile(&file_contents);
 

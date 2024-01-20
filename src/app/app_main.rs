@@ -11,7 +11,7 @@ pub struct App {
 impl App {
     // create new instance
     pub fn new() -> Self {
-        return Self { has_error: false };
+        Self { has_error: false }
     }
 
     pub fn run(&mut self) {

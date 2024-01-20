@@ -1,4 +1,4 @@
-use super::app::App;
+use super::app_main::App;
 use spdlog::{LevelFilter, Logger};
 use std::sync::Arc;
 
