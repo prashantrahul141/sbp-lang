@@ -18,6 +18,7 @@ impl Lexer {
     pub fn scan_token(&mut self) {
         let current_char = self.advance();
         match current_char {
+            // single character tokens.
             '(' => self.add_basic_token(TokenType::LeftParen),
             ')' => self.add_basic_token(TokenType::RightParen),
             '{' => self.add_basic_token(TokenType::LeftBrace),
@@ -28,18 +29,88 @@ impl Lexer {
             '+' => self.add_basic_token(TokenType::Plus),
             ';' => self.add_basic_token(TokenType::Semicolon),
             '*' => self.add_basic_token(TokenType::Star),
+
+            // multiple character basic tokens.
+            // !
+            '!' => {
+                if self.match_char('=') {
+                    // !=
+                    self.add_basic_token(TokenType::BangEqual);
+                } else {
+                    // =
+                    self.add_basic_token(TokenType::Bang);
+                }
+            }
+
+            // =
+            '=' => {
+                if self.match_char('=') {
+                    // ==
+                    self.add_basic_token(TokenType::EqualEqual);
+                } else {
+                    // =
+                    self.add_basic_token(TokenType::Equal);
+                }
+            }
+
+            // <
+            '<' => {
+                if self.match_char('=') {
+                    // <=
+                    self.add_basic_token(TokenType::LessEqual);
+                } else {
+                    // <
+                    self.add_basic_token(TokenType::Less);
+                }
+            }
+
+            // >
+            '>' => {
+                if self.match_char('=') {
+                    // >=
+                    self.add_basic_token(TokenType::GreaterEqual);
+                } else {
+                    // >
+                    self.add_basic_token(TokenType::Greater);
+                }
+            }
+
+            // longer lexemes
+            // comments
+            '/' => {
+                if self.match_char('/') {
+                    // keep consuming characters untill we reach the end of file or newline.
+                    while self.look_ahead() != '\n' && !self.is_at_end() {
+                        self.advance();
+                    }
+                    // we dont add any token for comments BECAUSE they're comments.
+                } else {
+                    // its a simple slash.
+                    self.add_basic_token(TokenType::Slash);
+                }
+            }
+
+            ' ' | '\t' | '\r' => {
+                // ignore these characters, we dont need'em.
+                spdlog::trace!("ignoring whitespaces");
+            }
+
+            // newline, its basically a single line character.
             '\n' => {
                 self.line += 1;
                 spdlog::trace!("found newline, incrementing line number and skipping.");
             }
+
+            // reporting error but keep scanning if found an unexpected character.
             _ => {
                 spdlog::error!(
-                    "found a character which is not defined at line : {}",
+                    "unexpected character : {} at line : {}",
+                    current_char,
                     self.line
                 );
                 App::error(
                     self.line,
-                    "Found a character which is not defined.".to_string(),
+                    format!("unexpected character : {}", current_char),
                 );
             }
         }
