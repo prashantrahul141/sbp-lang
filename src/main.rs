@@ -10,6 +10,7 @@ mod app {
 
 mod lexer {
     pub mod lexer_main;
+    mod scanners;
     mod utils;
 }
 
