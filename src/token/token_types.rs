@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TokenType {
     // single-character tokens.
     LeftParen,
@@ -29,22 +29,22 @@ pub enum TokenType {
     Number,
 
     // keywords
-    And,
-    Class,
-    Else,
+    True,
     False,
-    Fn,
-    For,
-    If,
     Null,
+    And,
     Or,
-    Print,
+    Let,
+    Class,
+    Fn,
     Return,
     Super,
     This,
-    True,
-    Var,
+    If,
+    Else,
     While,
+    For,
+    Print,
 
     // end of file.
     Eof,

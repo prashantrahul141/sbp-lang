@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::lexer_main::Lexer;
 use crate::token::{token_main::Token, token_main::TokenLiterals, token_types::TokenType};
 
@@ -5,7 +7,7 @@ impl Lexer {
     /// creates and returns a new instance of lexer struct.
     /// # Arguments
     /// * `source_string` - input source string.
-    pub fn new(source_string: String) -> Self {
+    pub fn new(source_string: String, reserved_keywords: HashMap<String, TokenType>) -> Self {
         spdlog::trace!("creating lexer.");
         Self {
             start: 0,
@@ -15,6 +17,7 @@ impl Lexer {
             len: source_string.len(),
             source_string: source_string.clone(),
             source_chars: source_string.chars().collect(),
+            reserved_keywords,
         }
     }
 

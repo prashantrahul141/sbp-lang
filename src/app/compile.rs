@@ -9,7 +9,7 @@ impl App {
     pub fn compile(&self, source: String) {
         // lexical analysis.
         spdlog::debug!("compiling : \n{}", source);
-        let mut lexer = Lexer::new(source);
+        let mut lexer = Lexer::new(source, App::get_reserved_keywords());
         let _tokens = lexer.scan_tokens();
     }
 }

@@ -4,6 +4,7 @@ mod app {
     mod compile;
     mod compile_file;
     mod docs;
+    mod global_const;
     mod repl;
     mod utils;
 }

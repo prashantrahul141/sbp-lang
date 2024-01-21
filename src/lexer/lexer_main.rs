@@ -2,6 +2,7 @@ use crate::app::app_main::App;
 use crate::token::token_main::Token;
 use crate::token::token_main::TokenLiterals;
 use crate::token::token_types::TokenType;
+use std::collections::HashMap;
 
 /// The Lexer struct.
 /// converts the entire source input string into tokens.
@@ -20,6 +21,8 @@ pub struct Lexer {
     pub source_string: String,
     /// Input source string in form of a vector of characters.
     pub source_chars: Vec<char>,
+    /// contains all reserved keywords.
+    pub reserved_keywords: HashMap<String, TokenType>,
 }
 
 impl Lexer {
@@ -125,6 +128,7 @@ impl Lexer {
                     self.scan_number();
                 } else if Lexer::is_alpha(current_char) {
                     spdlog::trace!("trying to parse an indentifier.");
+                    self.scan_indentifier();
                 } else {
                     spdlog::error!(
                         "unexpected character : {} at line : {}",
