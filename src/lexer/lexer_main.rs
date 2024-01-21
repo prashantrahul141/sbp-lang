@@ -120,15 +120,22 @@ impl Lexer {
 
             // reporting error but keep scanning if found an unexpected character.
             _ => {
-                spdlog::error!(
-                    "unexpected character : {} at line : {}",
-                    current_char,
-                    self.line
-                );
-                App::error(
-                    self.line,
-                    format!("unexpected character : {}", current_char),
-                );
+                if Lexer::is_numeric(current_char) {
+                    spdlog::trace!("trying to parse a number.");
+                    self.scan_number();
+                } else if Lexer::is_alpha(current_char) {
+                    spdlog::trace!("trying to parse an indentifier.");
+                } else {
+                    spdlog::error!(
+                        "unexpected character : {} at line : {}",
+                        current_char,
+                        self.line
+                    );
+                    App::error(
+                        self.line,
+                        format!("unexpected character : {}", current_char),
+                    );
+                }
             }
         }
     }
@@ -140,12 +147,12 @@ impl Lexer {
 
         // scan individual tokens until EOF.
         while !self.is_at_end() {
-            spdlog::trace!("did not reach end, consuming.");
+            spdlog::trace!("did not reach end, scanning next token.");
             self.start = self.current;
             self.scan_token();
         }
 
-        spdlog::debug!("reached end of file, stopped consuming.");
+        spdlog::debug!("reached end of file, stopped scanning.");
 
         // add a EOF token at the end.
         self.add_token(TokenType::Eof, TokenLiterals::Null);
