@@ -2,7 +2,9 @@ use super::lexer_main::Lexer;
 use crate::token::{token_main::Token, token_main::TokenLiterals, token_types::TokenType};
 
 impl Lexer {
-    // constructor for lexer.
+    /// creates and returns a new instance of lexer struct.
+    /// # Arguments
+    /// * `source_string` - input source string.
     pub fn new(source_string: String) -> Self {
         spdlog::trace!("creating lexer.");
         Self {
@@ -16,7 +18,7 @@ impl Lexer {
         }
     }
 
-    // function to consume next char and return it.
+    /// Consumes one character and returns it.
     pub fn advance(&mut self) -> char {
         let current_char = self.source_chars[self.current];
         self.current += 1;
@@ -45,12 +47,17 @@ impl Lexer {
         true
     }
 
-    // helper function to add basic tokens
+    /// Add a token to the global tokens vector of token_type given and Null as token literal value.
+    /// # Arguments
+    /// * `token_type` - Type of the token to add.
     pub fn add_basic_token(&mut self, token_type: TokenType) {
         self.add_token(token_type, TokenLiterals::Null);
     }
 
-    // function to add a token to the tokens list.
+    /// Adds a token to the tokens list.
+    /// # Arguments
+    /// * `token_type` - Type of the token to add.
+    /// * `token_literal` - Token literal
     pub fn add_token(&mut self, token_type: TokenType, token_literal: TokenLiterals) {
         spdlog::trace!("adding token : ");
         self.tokens.push(Token::new(
@@ -61,7 +68,7 @@ impl Lexer {
         ));
     }
 
-    // helper function to check if consumed the entire file.
+    /// Check and returns if reached the end of the input source string.
     pub fn is_at_end(&self) -> bool {
         spdlog::trace!(
             "checking if reached end, current : {}, len : {}",
@@ -71,8 +78,8 @@ impl Lexer {
         self.current >= self.len
     }
 
-    /// Helper function to lookahead a character without consuming it.
-    // returns \0 if reached the end of file.
+    /// Returns the next char in input source string but doesnt consume it.
+    /// returns '\0' if reached the end of file.
     pub fn look_ahead(&self) -> char {
         if self.is_at_end() {
             return '\0';

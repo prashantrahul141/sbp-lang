@@ -3,18 +3,27 @@ use crate::token::token_main::Token;
 use crate::token::token_main::TokenLiterals;
 use crate::token::token_types::TokenType;
 
+/// The Lexer struct.
+/// converts the entire source input string into tokens.
 pub struct Lexer {
+    /// Start of the current token being scanned.
     pub start: usize,
+    /// Current position of the cursor.
     pub current: usize,
+    /// Current line of the cursor.
     pub line: usize,
+    /// Total length of the input source string.
     pub len: usize,
+    /// Final tokens vector.
     pub tokens: Vec<Token>,
+    /// Input source string.
     pub source_string: String,
+    /// Input source string in form of a vector of characters.
     pub source_chars: Vec<char>,
 }
 
 impl Lexer {
-    // scans indiviual tokens.
+    /// The main function to scan each individual tokens and call functions accordingly.
     pub fn scan_token(&mut self) {
         let current_char = self.advance();
         match current_char {
@@ -116,11 +125,12 @@ impl Lexer {
         }
     }
 
-    /// lexer scan tokens function.
+    /// Loops through entire input source string and calls can token until EOF.
     /// returns a vector of all scanned tokens.
     pub fn scan_tokens(&mut self) -> &Vec<Token> {
         spdlog::debug!("scanning tokens");
 
+        // scan individual tokens until EOF.
         while !self.is_at_end() {
             spdlog::trace!("did not reach end, consuming.");
             self.start = self.current;
@@ -129,6 +139,7 @@ impl Lexer {
 
         spdlog::debug!("reached end of file, stopped consuming.");
 
+        // add a EOF token at the end.
         self.add_token(TokenType::Eof, TokenLiterals::Null);
 
         spdlog::debug!(
@@ -140,6 +151,7 @@ impl Lexer {
             println!("{}", i);
         }
 
+        // return ref to tokens vector.
         &self.tokens
     }
 }

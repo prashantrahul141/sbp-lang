@@ -2,7 +2,9 @@ use super::app_main::App;
 use std::io::{self, stdout, Write};
 
 impl App {
+    /// Instance method to be called when repl command in invoked.
     pub fn repl(&mut self) {
+        // input source string.
         let mut source = String::new();
 
         // looping infinitely
