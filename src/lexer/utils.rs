@@ -1,8 +1,5 @@
 use super::lexer_main::Lexer;
-use crate::{
-    app::app_main::App,
-    token::{token_main::Token, token_main::TokenLiterals, token_types::TokenType},
-};
+use crate::token::{token_main::Token, token_main::TokenLiterals, token_types::TokenType};
 
 impl Lexer {
     /// creates and returns a new instance of lexer struct.
@@ -88,34 +85,37 @@ impl Lexer {
         self.source_chars[self.current]
     }
 
-    /// Creates a token for strings.
-    pub fn scan_string(&mut self) {
-        // looping until another " is found or end of file is found.
-        spdlog::trace!("looping to parse string token.");
-        while self.look_ahead() != '"' && !self.is_at_end() {
-            // incrementing line number whenever newline is found.
-            if self.look_ahead() == '\n' {
-                spdlog::trace!("found newline inside a string.");
-                self.line += 1;
-            }
-
-            // consuming character.
-            self.advance();
+    /// Returns the next char in input source string but doesnt consume it.
+    /// returns '\0' if reached the end of file.
+    pub fn look_ahead_twice(&self) -> char {
+        if self.current + 1 >= self.len {
+            return '\0';
         }
 
-        // if reached the end without a "
-        if self.is_at_end() {
-            spdlog::error!("found a unterminated string, returning.");
-            App::error(self.line, "Unterminated strings.".to_string());
-            return;
-        }
+        self.source_chars[self.current + 1]
+    }
 
-        // consume the ending "
-        spdlog::trace!("consuming ending \"");
-        self.advance();
+    /// Checks if the given char is ascii alpabetic or _; return True.
+    /// else returns False.
+    /// # Arguments
+    /// * `target_char` - the character to check
+    pub fn is_alpha(target_char: char) -> bool {
+        target_char.is_ascii_alphabetic() || target_char == '_'
+    }
 
-        // trim the surrounding quotes.
-        let literal = self.source_string[self.start + 1..self.current - 1].to_string();
-        self.add_token(TokenType::String, TokenLiterals::String(literal));
+    /// Checks if the given char is ascii numeric.
+    /// else returns False.
+    /// # Arguments
+    /// * `target_char` - the character to check
+    pub fn is_numeric(target_char: char) -> bool {
+        target_char.is_ascii_digit()
+    }
+
+    /// Checks if the given char is ascii numeric, or ascii alpabetic or _; return True.
+    /// else returns False.
+    /// # Arguments
+    /// * `target_char` - the character to check
+    pub fn is_alphanumeric(target_char: char) -> bool {
+        Lexer::is_alpha(target_char) || Lexer::is_numeric(target_char)
     }
 }
