@@ -25,7 +25,9 @@ pub struct Lexer {
 impl Lexer {
     /// The main function to scan each individual tokens and call functions accordingly.
     pub fn scan_token(&mut self) {
+        // consume next token.
         let current_char = self.advance();
+
         match current_char {
             // single character tokens.
             '(' => self.add_basic_token(TokenType::LeftParen),
@@ -99,8 +101,8 @@ impl Lexer {
                 }
             }
 
+            // ignore these characters, we dont need'em.
             ' ' | '\t' | '\r' => {
-                // ignore these characters, we dont need'em.
                 spdlog::trace!("ignoring whitespaces");
             }
 
@@ -108,6 +110,12 @@ impl Lexer {
             '\n' => {
                 self.line += 1;
                 spdlog::trace!("found newline, incrementing line number and skipping.");
+            }
+
+            // strings!.
+            '"' => {
+                spdlog::trace!("scanning a string token.");
+                self.scan_string();
             }
 
             // reporting error but keep scanning if found an unexpected character.

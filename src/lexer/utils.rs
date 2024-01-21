@@ -1,5 +1,8 @@
 use super::lexer_main::Lexer;
-use crate::token::{token_main::Token, token_main::TokenLiterals, token_types::TokenType};
+use crate::{
+    app::app_main::App,
+    token::{token_main::Token, token_main::TokenLiterals, token_types::TokenType},
+};
 
 impl Lexer {
     /// creates and returns a new instance of lexer struct.
@@ -60,12 +63,9 @@ impl Lexer {
     /// * `token_literal` - Token literal
     pub fn add_token(&mut self, token_type: TokenType, token_literal: TokenLiterals) {
         spdlog::trace!("adding token : ");
-        self.tokens.push(Token::new(
-            token_type,
-            "".to_string(),
-            token_literal,
-            self.line,
-        ));
+        let lexeme = self.source_string[self.start..self.current].to_string();
+        self.tokens
+            .push(Token::new(token_type, lexeme, token_literal, self.line));
     }
 
     /// Check and returns if reached the end of the input source string.
@@ -86,5 +86,36 @@ impl Lexer {
         }
 
         self.source_chars[self.current]
+    }
+
+    /// Creates a token for strings.
+    pub fn scan_string(&mut self) {
+        // looping until another " is found or end of file is found.
+        spdlog::trace!("looping to parse string token.");
+        while self.look_ahead() != '"' && !self.is_at_end() {
+            // incrementing line number whenever newline is found.
+            if self.look_ahead() == '\n' {
+                spdlog::trace!("found newline inside a string.");
+                self.line += 1;
+            }
+
+            // consuming character.
+            self.advance();
+        }
+
+        // if reached the end without a "
+        if self.is_at_end() {
+            spdlog::error!("found a unterminated string, returning.");
+            App::error(self.line, "Unterminated strings.".to_string());
+            return;
+        }
+
+        // consume the ending "
+        spdlog::trace!("consuming ending \"");
+        self.advance();
+
+        // trim the surrounding quotes.
+        let literal = self.source_string[self.start + 1..self.current - 1].to_string();
+        self.add_token(TokenType::String, TokenLiterals::String(literal));
     }
 }
