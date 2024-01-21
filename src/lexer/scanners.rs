@@ -78,4 +78,27 @@ impl Lexer {
             }
         }
     }
+
+    /// Creates a token for identifer..
+    pub fn scan_indentifier(&mut self) {
+        spdlog::trace!("parsing an identifer.");
+        while Lexer::is_alphanumeric(self.look_ahead()) {
+            spdlog::trace!("found another alphanumber, advancing.");
+            self.advance();
+        }
+
+        let lexeme = self.source_string[self.start..self.current].to_string();
+        spdlog::trace!("checking for already existing keywords for : {}", lexeme);
+        match self.reserved_keywords.get(&lexeme) {
+            Some(reserved_keyword_type) => {
+                spdlog::trace!("found match for : {}", lexeme);
+                self.add_basic_token(reserved_keyword_type.clone());
+            }
+            None => {
+                spdlog::trace!("No match found for : {}", lexeme);
+                spdlog::trace!("adding token as identifer");
+                self.add_basic_token(TokenType::Identifier)
+            }
+        }
+    }
 }
