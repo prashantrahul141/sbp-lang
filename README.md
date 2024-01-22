@@ -1,1 +1,1 @@
-# sbp-lang
+# Splax lang.
