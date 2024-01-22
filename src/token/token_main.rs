@@ -56,9 +56,13 @@ impl std::fmt::Display for Token {
     }
 }
 
-/// Using Debug's implementation as the Display implementation for TokenLiterals.
+/// display implementation for token literals.
 impl std::fmt::Display for TokenLiterals {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
+        match self {
+            TokenLiterals::Number(n) => write!(f, "{}", n),
+            TokenLiterals::String(s) => write!(f, "{}", s),
+            TokenLiterals::Null => write!(f, "null"),
+        }
     }
 }
