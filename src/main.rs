@@ -20,6 +20,11 @@ mod token {
     pub mod token_types;
 }
 
+mod parser {
+    pub mod ast_printer;
+    pub mod parser_main;
+}
+
 fn main() {
     // creating app.
     let mut app = app::app_main::App::new();
