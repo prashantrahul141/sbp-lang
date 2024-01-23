@@ -1,7 +1,7 @@
 use super::token_types::TokenType;
 
 /// The Token struct, holds info about a single token.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     // type of token.
     pub token_type: TokenType,
@@ -14,12 +14,14 @@ pub struct Token {
 }
 
 /// enum for token literals.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TokenLiterals {
     // if the token literal is integer or float.
     Number(f64),
     // if the token literal is string.
     String(String),
+    // if the token literal is boolean.
+    Boolean(bool),
     // all other token types.
     Null,
 }
@@ -62,6 +64,7 @@ impl std::fmt::Display for TokenLiterals {
         match self {
             TokenLiterals::Number(n) => write!(f, "{}", n),
             TokenLiterals::String(s) => write!(f, "{}", s),
+            TokenLiterals::Boolean(s) => write!(f, "{}", s),
             TokenLiterals::Null => write!(f, "null"),
         }
     }
