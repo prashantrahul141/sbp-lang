@@ -79,7 +79,7 @@ impl std::fmt::Display for Grouping {
     }
 }
 
-/// Grammer for literals.
+/// Grammer for literals.ast
 #[derive(Debug)]
 pub struct Literal {
     // token literal.

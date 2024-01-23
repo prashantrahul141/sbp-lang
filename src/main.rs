@@ -1,4 +1,5 @@
 mod cli;
+
 mod app {
     pub mod app_main;
     mod compile;
@@ -20,9 +21,9 @@ mod token {
     pub mod token_types;
 }
 
-mod parser {
+mod ast {
+    pub mod ast;
     pub mod ast_printer;
-    pub mod parser_main;
 }
 
 fn main() {
