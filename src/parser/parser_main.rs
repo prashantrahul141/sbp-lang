@@ -38,6 +38,7 @@ impl Parser {
                     })));
                 }
             }
+            return Some(left);
         }
         None
     }
@@ -64,6 +65,8 @@ impl Parser {
                     })));
                 }
             }
+
+            return Some(left);
         }
 
         None
@@ -85,6 +88,8 @@ impl Parser {
                     })));
                 }
             }
+
+            return Some(left);
         }
 
         None
@@ -105,6 +110,8 @@ impl Parser {
                     })));
                 }
             }
+
+            return Some(left);
         }
         None
     }
