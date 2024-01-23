@@ -4,10 +4,10 @@ use crate::token::token_main::{Token, TokenLiterals};
 /// Holds variants for all types of expressions.
 #[derive(Debug)]
 pub enum Expr {
-    Binary(Box<Binary>),
-    Grouping(Box<Grouping>),
-    Literal(Box<Literal>),
-    Unary(Box<Unary>),
+    Binary(Box<ExprBinary>),
+    Grouping(Box<ExprGrouping>),
+    Literal(Box<ExprLiteral>),
+    Unary(Box<ExprUnary>),
 }
 
 /// display implementation for token expr.
@@ -28,10 +28,10 @@ impl std::fmt::Display for Expr {
 /// When any new pass/feature we need to implement to the expressions,
 /// we just impl this visitor trait to that struct.
 pub trait Visitor {
-    fn visit_binary_expr(&mut self, expr: &Binary);
-    fn visit_grouping_expr(&mut self, expr: &Grouping);
-    fn visit_literal_expr(&mut self, expr: &Literal);
-    fn visit_unary_expr(&mut self, expr: &Unary);
+    fn visit_binary_expr(&mut self, expr: &ExprBinary);
+    fn visit_grouping_expr(&mut self, expr: &ExprGrouping);
+    fn visit_literal_expr(&mut self, expr: &ExprLiteral);
+    fn visit_unary_expr(&mut self, expr: &ExprUnary);
 }
 
 /// Walker, in other implementation this will be called `accept`.
@@ -49,7 +49,7 @@ pub fn walk_expr(visitor: &mut dyn Visitor, expr: &Expr) {
 
 /// Grammer for binary expressions.
 #[derive(Debug)]
-pub struct Binary {
+pub struct ExprBinary {
     // left operand.
     pub left: Expr,
     // operator.
@@ -59,7 +59,7 @@ pub struct Binary {
 }
 
 /// display implementation for binary token.
-impl std::fmt::Display for Binary {
+impl std::fmt::Display for ExprBinary {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} {} {}", self.operator.lexeme, self.left, self.right)
     }
@@ -67,13 +67,13 @@ impl std::fmt::Display for Binary {
 
 /// Grammer for grouping expressions.
 #[derive(Debug)]
-pub struct Grouping {
+pub struct ExprGrouping {
     // grouped expression.
     pub expression: Expr,
 }
 
 /// display implementation for grouping token.
-impl std::fmt::Display for Grouping {
+impl std::fmt::Display for ExprGrouping {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "( group {} )", self.expression)
     }
@@ -81,13 +81,13 @@ impl std::fmt::Display for Grouping {
 
 /// Grammer for literals.ast
 #[derive(Debug)]
-pub struct Literal {
+pub struct ExprLiteral {
     // token literal.
     pub value: TokenLiterals,
 }
 
 /// display implementation for literal token.
-impl std::fmt::Display for Literal {
+impl std::fmt::Display for ExprLiteral {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.value)
     }
@@ -95,7 +95,7 @@ impl std::fmt::Display for Literal {
 
 /// Grammer for unary expressions.
 #[derive(Debug)]
-pub struct Unary {
+pub struct ExprUnary {
     /// unary operator.
     pub operator: Token,
     /// operand.
@@ -103,7 +103,7 @@ pub struct Unary {
 }
 
 /// display implementation for unary token.
-impl std::fmt::Display for Unary {
+impl std::fmt::Display for ExprUnary {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} {}", self.operator, self.right)
     }

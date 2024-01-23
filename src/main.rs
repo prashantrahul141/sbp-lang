@@ -22,8 +22,8 @@ mod token {
 }
 
 mod ast {
-    pub mod ast;
     pub mod ast_printer;
+    pub mod ast_tree;
 }
 
 fn main() {
