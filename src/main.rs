@@ -28,6 +28,8 @@ mod ast {
 
 mod parser {
     pub mod error;
+    pub mod parser_main;
+    mod utils;
 }
 
 fn main() {
