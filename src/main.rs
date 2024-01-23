@@ -26,6 +26,10 @@ mod ast {
     pub mod ast_tree;
 }
 
+mod parser {
+    pub mod error;
+}
+
 fn main() {
     // creating app.
     let mut app = app::app_main::App::new();
