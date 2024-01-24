@@ -77,13 +77,12 @@ impl Parser {
         if self.is_at_end() {
             return false;
         }
-        self.peek().token_type == token_type.to_owned()
+        self.peek().token_type == *token_type
     }
 
     /// Returns the next token without consuming it.
     pub fn peek(&self) -> &Token {
-        let peeking_token = &self.tokens[self.current];
-        peeking_token
+        &self.tokens[self.current]
     }
 
     /// Check and returns if the next token is of EOF.

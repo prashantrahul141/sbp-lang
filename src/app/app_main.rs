@@ -5,12 +5,16 @@ use clap::Parser;
 /// this holds the implementation for calling all requied top level methods when called from cli.
 pub struct App {
     pub has_error: bool,
+    pub has_runtime_error: bool,
 }
 
 impl App {
     // create new instance
     pub fn new() -> Self {
-        Self { has_error: false }
+        Self {
+            has_error: false,
+            has_runtime_error: false,
+        }
     }
 
     pub fn run(&mut self) {
