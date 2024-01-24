@@ -1,6 +1,5 @@
 use crate::{
-    ast::{ast_printer::AstPrinter, ast_tree::walk_expr},
-    lexer::lexer_main::Lexer,
+    interpreter::interpreter_main::Interpreter, lexer::lexer_main::Lexer,
     parser::parser_main::Parser,
 };
 
@@ -22,15 +21,19 @@ impl App {
         let mut parser = Parser::new(tokens);
 
         match parser.parse() {
-            Some(exp) => {
-                let mut ast = AstPrinter::new();
-                walk_expr(&mut ast, &exp);
+            Some(expr) => {
+                if self.has_error {
+                    return;
+                }
+
+                spdlog::info!("does not have error till parsing.");
+                spdlog::info!("starting interpretering");
+
+                let mut interpreter = Interpreter::new();
+                let value = interpreter.interpret(expr);
+                println!("{:?}", value);
             }
             None => panic!("failed to parse"),
-        }
-
-        if self.has_error {
-            return;
         }
     }
 }
