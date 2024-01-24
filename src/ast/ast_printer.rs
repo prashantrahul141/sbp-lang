@@ -11,7 +11,7 @@ impl AstPrinter {
 }
 
 // implementing visitor for AstPrinter.
-impl Visitor for AstPrinter {
+impl Visitor<()> for AstPrinter {
     fn visit_binary_expr(&mut self, expr: &super::ast_tree::ExprBinary) {
         print!("( {} ", expr.operator.lexeme);
         walk_expr(self, &expr.left);

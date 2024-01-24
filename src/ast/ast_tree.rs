@@ -27,24 +27,24 @@ impl std::fmt::Display for Expr {
 ///
 /// When any new pass/feature we need to implement to the expressions,
 /// we just impl this visitor trait to that struct.
-pub trait Visitor {
-    fn visit_binary_expr(&mut self, expr: &ExprBinary);
-    fn visit_grouping_expr(&mut self, expr: &ExprGrouping);
-    fn visit_literal_expr(&mut self, expr: &ExprLiteral);
-    fn visit_unary_expr(&mut self, expr: &ExprUnary);
+pub trait Visitor<T> {
+    fn visit_binary_expr(&mut self, expr: &ExprBinary) -> T;
+    fn visit_grouping_expr(&mut self, expr: &ExprGrouping) -> T;
+    fn visit_literal_expr(&mut self, expr: &ExprLiteral) -> T;
+    fn visit_unary_expr(&mut self, expr: &ExprUnary) -> T;
 }
 
 /// Walker, in other implementation this will be called `accept`.
 /// # Arguments
 /// * `visitor` - The visitor struct which implements Visitor trait.
 /// * `expr` - The expression to walk.
-pub fn walk_expr(visitor: &mut dyn Visitor, expr: &Expr) {
+pub fn walk_expr<T>(visitor: &mut dyn Visitor<T>, expr: &Expr) -> T {
     match expr {
         Expr::Binary(e) => visitor.visit_binary_expr(e),
         Expr::Grouping(e) => visitor.visit_grouping_expr(e),
         Expr::Literal(e) => visitor.visit_literal_expr(e),
         Expr::Unary(e) => visitor.visit_unary_expr(e),
-    };
+    }
 }
 
 /// Grammer for binary expressions.
