@@ -1,6 +1,5 @@
-use crate::token::{token_main::Token, token_types::TokenType};
-
 use super::app_main::App;
+use crate::token::{token_main::Token, token_types::TokenType};
 use spdlog::Logger;
 use std::sync::Arc;
 
@@ -23,10 +22,10 @@ impl App {
 
     /// Global struct method to display error, its a wrapper for App::repot()
     /// # Arguments
-    /// * `line` - the line number in the file error was found.S
+    /// * `line` - the line number in the file error was found.
     /// * `message` - message to display.
     pub fn error(line: usize, message: String) {
-        App::report(line, "".to_string(), message)
+        App::report(line, "".to_string(), message.to_string());
     }
 
     /// Global struct method to display error, its a wrapper for App::repot()
@@ -50,5 +49,12 @@ impl App {
     pub fn report(line: usize, where_is: String, message: String) {
         spdlog::error!("App::report called for line : {line} with where_is : {where_is} and message : {message}");
         println!("[line {}] Error '{}' : {}", line, where_is, message);
+    }
+
+    /// Function to show runtime errors and set state.
+    /// # Argument
+    pub fn runtime_error(line: usize, message: String) {
+        App::report(line, "".to_string(), message.to_string());
+        panic!();
     }
 }
