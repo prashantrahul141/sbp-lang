@@ -5,7 +5,9 @@ use crate::{
 
 /// Top level parser struct.
 pub struct Parser {
+    // vector of tokens to parse.
     pub tokens: Vec<Token>,
+    // current progress of parsing.
     pub current: usize,
 }
 

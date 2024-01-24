@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
+// top level cli app struct.
 #[derive(Debug, Parser)]
 #[command(name="splax", about="A learning programming language.", long_about = None)]
 pub struct Cli {

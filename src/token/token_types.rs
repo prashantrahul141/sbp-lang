@@ -1,3 +1,4 @@
+/// All types of token splax can handle.
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     // single-character tokens.

@@ -16,7 +16,7 @@ impl Visitor<TokenLiterals> for Interpreter {
         let left = walk_expr(self, &expr.left);
         let right = walk_expr(self, &expr.right);
 
-        spdlog::trace!("interpreting binary expression: {:?}", expr);
+        spdlog::debug!("interpreting binary expression: {:?}", expr);
 
         // matching right literal.
         match right {
@@ -40,6 +40,7 @@ impl Visitor<TokenLiterals> for Interpreter {
                     TokenType::BangEqual => TokenLiterals::Boolean(left_value != right_value),
                     TokenType::EqualEqual => TokenLiterals::Boolean(left_value == right_value),
 
+                    // any other operators are not for number.
                     _ => {
                         panic!("This is unreachable, if somehow you managed to trigger this, idk.")
                     }
@@ -72,6 +73,8 @@ impl Visitor<TokenLiterals> for Interpreter {
                     // equality operators for strings.
                     TokenType::BangEqual => TokenLiterals::Boolean(left_value != right_value),
                     TokenType::EqualEqual => TokenLiterals::Boolean(left_value == right_value),
+
+                    // any other operator is not for strings.
                     _ => {
                         App::runtime_error(
                             expr.operator.line,

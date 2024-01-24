@@ -12,8 +12,9 @@ impl Interpreter {
 
     /// top level public method to start interpretion of an expression.
     /// # Arguments
-    /// *
+    /// * `expr` - The expression to interpret.
     pub fn interpret(&mut self, expr: Expr) -> TokenLiterals {
+        spdlog::info!("start interpreting");
         walk_expr(self, &expr)
     }
 
@@ -21,6 +22,7 @@ impl Interpreter {
     /// # Arguments
     /// * `token_literal` - Token literal to check if its truth or false.
     pub fn is_truth(&self, token_literal: TokenLiterals) -> TokenLiterals {
+        spdlog::trace!("checking truthy for literal : {}", token_literal);
         match token_literal {
             TokenLiterals::Boolean(value) => TokenLiterals::Boolean(!value),
             TokenLiterals::Number(value) => TokenLiterals::Boolean(value != 0_f64),

@@ -5,11 +5,18 @@ use crate::{
 };
 
 impl Parser {
+    /// Constructor for parser.
+    /// # Arguments
+    /// * `tokens` : Vector of tokens to parse.
     pub fn new(tokens: Vec<Token>) -> Self {
         spdlog::debug!("creating new parser");
         Self { tokens, current: 0 }
     }
 
+    /// checks and consumes current token, else gives the provided error message.
+    /// # Arguments
+    /// * `token_type` - Type of token to check for,
+    /// * `message` - String message to display incase to fail match.
     pub fn consume(&mut self, token_type: TokenType, message: String) -> Option<&Token> {
         spdlog::trace!("consume called for TokenType : {token_type} and message : {message}");
         if self.check(&token_type) {
@@ -21,6 +28,10 @@ impl Parser {
         None
     }
 
+    /// parser error helper, wrapper for App's error.
+    /// # Arguments
+    /// * `token` - Reference to token which caused error.
+    /// * `message` - The error message to show.
     pub fn error(&self, token: &Token, message: String) -> ParserError {
         App::error_token(token.clone(), message);
         ParserError::new()
@@ -92,6 +103,9 @@ impl Parser {
         reached_end
     }
 
+    /// Splax's core way of handling faulty statements.
+    /// It keeps consuming tokens untill a semi colon is reached, or
+    /// a new statement is started.
     pub fn synchronize(&mut self) {
         spdlog::trace!("trying to synchronize.");
         self.advance();

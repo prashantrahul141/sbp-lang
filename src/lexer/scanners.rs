@@ -87,8 +87,11 @@ impl Lexer {
             self.advance();
         }
 
+        // lexeme string of the identifier.
         let lexeme = self.source_string[self.start..self.current].to_string();
         spdlog::trace!("checking for already existing keywords for : {}", lexeme);
+
+        // check if the identifier is a reserved keyword.
         match self.reserved_keywords.get(&lexeme) {
             Some(reserved_keyword_type) => {
                 spdlog::trace!("found match for : {}", lexeme);

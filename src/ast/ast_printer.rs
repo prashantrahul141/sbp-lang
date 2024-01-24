@@ -5,6 +5,9 @@ use crate::ast::ast_tree::walk_expr;
 pub struct AstPrinter;
 
 impl AstPrinter {
+    #[allow(dead_code)]
+    // this is a debug only struct, we might not want to always create the
+    // AST tree string representation, which can result int poor performance.
     pub fn new() -> Self {
         Self
     }

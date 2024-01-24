@@ -166,11 +166,9 @@ impl Lexer {
             self.tokens.len()
         );
 
-        for i in &self.tokens {
-            println!("{}", i);
-        }
+        spdlog::trace!("{:?}", self.tokens);
 
-        // return ref to tokens vector.
+        // return ref
         &self.tokens
     }
 }

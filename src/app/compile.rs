@@ -1,9 +1,8 @@
+use super::app_main::App;
 use crate::{
     interpreter::interpreter_main::Interpreter, lexer::lexer_main::Lexer,
     parser::parser_main::Parser,
 };
-
-use super::app_main::App;
 
 impl App {
     /// Top level compile function, this function
@@ -27,7 +26,6 @@ impl App {
                 }
 
                 spdlog::info!("does not have error till parsing.");
-                spdlog::info!("starting interpretering");
 
                 let mut interpreter = Interpreter::new();
                 let value = interpreter.interpret(expr);
