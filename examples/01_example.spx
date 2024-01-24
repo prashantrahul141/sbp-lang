@@ -1,0 +1,8 @@
+// this is a comment
+// basic tokenization test
+(( )){} // grouping stuff
+!*+-/=<> <= == // operators
+"testin string" // strings
+12 3 123.3 + 2 .23 23. // numericals
+let this be super not or and "and" // indentifiers
+true "true" false "false" // boolean
