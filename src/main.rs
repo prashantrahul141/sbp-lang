@@ -24,6 +24,7 @@ mod token {
 mod ast {
     pub mod ast_printer;
     pub mod expr_ast;
+    pub mod stmt_ast;
 }
 
 mod parser {
@@ -33,6 +34,8 @@ mod parser {
 }
 
 mod interpreter {
+    pub mod impl_expr_visitor;
+    pub mod impl_stmt_visitor;
     pub mod interpreter_main;
     pub mod utils;
 }
