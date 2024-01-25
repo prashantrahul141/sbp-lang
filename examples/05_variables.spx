@@ -1,0 +1,12 @@
+let a; // create a variable without assigning any value, splax defaults to null.
+print a; // null
+
+let b = 3; // create and assign value in one line.
+let c = 2;
+print b + c; // 5
+
+let d = "strings are ";
+let e = "easy";
+print d + e;
+
+print f; // runtime error
