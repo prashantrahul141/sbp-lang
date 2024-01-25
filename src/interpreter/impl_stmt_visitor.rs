@@ -19,4 +19,17 @@ impl StmtVisitor for Interpreter {
         let value = walk_expr(self, &stmt.expr);
         println!("{}", value);
     }
+
+    /// struct method walks/executes let statements.
+    /// # Arguments
+    /// * `stmt` - stmtlet stmt to walk.
+    fn visit_let_stmt(&mut self, stmt: &crate::ast::stmt_ast::StmtLet) {
+        let value = walk_expr(self, &stmt.initialiser);
+        spdlog::debug!(
+            "defining variable : {} with value : {}",
+            stmt.name.lexeme,
+            value
+        );
+        self.environment.define(stmt.name.lexeme.to_owned(), value);
+    }
 }
