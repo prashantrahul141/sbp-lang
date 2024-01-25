@@ -38,4 +38,8 @@ impl ExprVisitor<()> for AstPrinter {
         walk_expr(self, &expr.right);
         print!(")");
     }
+
+    fn visit_let_expr(&mut self, expr: &super::expr_ast::ExprVariable) {
+        print!(" {} ", expr.name);
+    }
 }

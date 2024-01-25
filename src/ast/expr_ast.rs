@@ -8,6 +8,7 @@ pub enum Expr {
     Grouping(Box<ExprGrouping>),
     Literal(Box<ExprLiteral>),
     Unary(Box<ExprUnary>),
+    Variable(Box<ExprVariable>),
 }
 
 /// display implementation for token expr.
@@ -18,6 +19,7 @@ impl std::fmt::Display for Expr {
             Expr::Grouping(n) => write!(f, "{}", n),
             Expr::Literal(n) => write!(f, "{}", n),
             Expr::Unary(n) => write!(f, "{}", n),
+            Expr::Variable(n) => write!(f, "{}", n.name),
         }
     }
 }
@@ -32,6 +34,7 @@ pub trait ExprVisitor<T> {
     fn visit_grouping_expr(&mut self, expr: &ExprGrouping) -> T;
     fn visit_literal_expr(&mut self, expr: &ExprLiteral) -> T;
     fn visit_unary_expr(&mut self, expr: &ExprUnary) -> T;
+    fn visit_let_expr(&mut self, expr: &ExprVariable) -> T;
 }
 
 /// Walker, in other implementation this will be called `accept`.
@@ -44,6 +47,7 @@ pub fn walk_expr<T>(visitor: &mut dyn ExprVisitor<T>, expr: &Expr) -> T {
         Expr::Grouping(e) => visitor.visit_grouping_expr(e),
         Expr::Literal(e) => visitor.visit_literal_expr(e),
         Expr::Unary(e) => visitor.visit_unary_expr(e),
+        Expr::Variable(e) => visitor.visit_let_expr(e),
     }
 }
 
@@ -106,5 +110,19 @@ pub struct ExprUnary {
 impl std::fmt::Display for ExprUnary {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} {}", self.operator, self.right)
+    }
+}
+
+/// Grammer for variable declarations.
+#[derive(Debug)]
+pub struct ExprVariable {
+    // name of the variable.
+    pub name: Token,
+}
+
+/// display implementation for unary token.
+impl std::fmt::Display for ExprVariable {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name)
     }
 }

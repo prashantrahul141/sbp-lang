@@ -163,4 +163,12 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
             _ => right,
         }
     }
+
+    /// Evalute let expressions.
+    /// # Arguments
+    /// * `expr` - Unary expression.
+    fn visit_let_expr(&mut self, expr: &crate::ast::expr_ast::ExprVariable) -> TokenLiterals {
+        spdlog::trace!("interpreting variable expression: {:?}", expr);
+        self.environment.get(expr.name.to_owned())
+    }
 }
