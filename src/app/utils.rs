@@ -1,5 +1,6 @@
 use super::app_main::App;
 use crate::token::{token_main::Token, token_types::TokenType};
+use core::panic;
 use spdlog::Logger;
 use std::sync::Arc;
 
@@ -67,8 +68,23 @@ impl App {
 
     /// Function to show runtime errors and set state.
     /// # Argument
+    /// * `line` - line number where error occured.
+    /// * `message` - message for the error.
     pub fn runtime_error(line: usize, message: String) {
+        spdlog::error!("App::runtime_error called for line : {line} wht message : {message}");
         App::report(line, "".to_string(), message.to_string());
-        panic!();
+        panic!("[line {}] : {}", line, message);
+    }
+
+    /// Sets up hook for global panic!().
+    pub fn setup_custom_panic() {
+        use std::panic;
+        panic::set_hook(Box::new(|panic_info| {
+            if let Some(message) = panic_info.payload().downcast_ref::<&str>() {
+                println!("Runtime panic occured: {message:?}");
+            } else {
+                println!("Runtime panic occured.");
+            }
+        }));
     }
 }

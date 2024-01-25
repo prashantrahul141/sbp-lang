@@ -43,6 +43,8 @@ fn main() {
 
     // setup logging.
     app::app_main::App::setup_logging();
+    // setup custom panic!() message.
+    app::app_main::App::setup_custom_panic();
 
     // running.
     app.run();
