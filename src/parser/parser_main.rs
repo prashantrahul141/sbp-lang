@@ -237,7 +237,7 @@ impl Parser {
             }
         }
 
-        self.error(self.peek(), "Expected expression.".to_string());
+        self.parser_report_error(self.peek(), "Expected expression.".to_string());
 
         None
     }

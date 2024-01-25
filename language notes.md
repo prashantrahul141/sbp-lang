@@ -15,24 +15,35 @@ operator    ->   "==" | "!=" | "<" | "<=" | ">" | ">=" | "+"  | "-"  | "*" | "/"
 
 ### Recursive decent parser grammer
 ```
-program     ->     statement* EOF ;
+program       ->     declaration* EOF ;
 
-statement   ->     exprStmt
-                 | printStmt ;
+declaration   ->     varDecl
+                    | statement ;
 
-expression  ->     equality ;
+varDecl       ->     "let" IDENTIFIER ( "=" expression )? ";" ;
 
-equality    ->     comparison ( ( "!=" | "==" ) comparison )* ;
+statement     ->     exprStmt
+                   | printStmt ;
 
-comparison  ->     term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+expression    ->     equality ;
 
-term        ->     factor ( ( "-" | "+" ) factor )* ;
+equality      ->     comparison ( ( "!=" | "==" ) comparison )* ;
 
-factor      ->     unary ( ( "/" | "*" ) unary )* ;
+comparison    ->     term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 
-unary       ->     ( "!" | "-" ) unary | primary ;
+term          ->     factor ( ( "-" | "+" ) factor )* ;
 
-primary     ->     NUMBER | STRING | "true" | "false" | "null" | "(" expression ")" ;
+factor        ->     unary ( ( "/" | "*" ) unary )* ;
+
+unary         ->     ( "!" | "-" ) unary | primary ;
+
+primary       ->     NUMBER 
+                   | STRING 
+                   | "true" 
+                   | "false" 
+                   | "null" 
+                   | "(" expression ")" 
+                   | IDENTIFIER ;
 
 ```
 

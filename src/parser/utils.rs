@@ -1,4 +1,4 @@
-use super::{error::ParserError, parser_main::Parser};
+use super::parser_main::Parser;
 use crate::{
     app::app_main::App,
     token::{token_main::Token, token_types::TokenType},
@@ -24,7 +24,7 @@ impl Parser {
             return Some(self.advance());
         }
 
-        self.error(self.peek(), message);
+        self.parser_report_error(self.peek(), message);
         None
     }
 
@@ -32,9 +32,8 @@ impl Parser {
     /// # Arguments
     /// * `token` - Reference to token which caused error.
     /// * `message` - The error message to show.
-    pub fn error(&self, token: &Token, message: String) -> ParserError {
+    pub fn parser_report_error(&self, token: &Token, message: String) {
         App::error_token(token.clone(), message);
-        ParserError::new()
     }
 
     /// Takes in a vec of TokenTypes, compares it with current type of the Token

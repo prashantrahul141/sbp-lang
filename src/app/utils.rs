@@ -50,7 +50,7 @@ impl App {
     /// * `message` - message to display.
     pub fn error_token(token: Token, message: String) {
         if token.token_type == TokenType::Eof {
-            App::report(token.line, " at end {}".to_string(), message);
+            App::report(token.line, " at end ".to_string(), message);
         } else {
             App::report(token.line, format!(" at '{}' ", token.lexeme), message);
         }
