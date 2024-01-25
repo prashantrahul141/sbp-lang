@@ -1,4 +1,4 @@
-use super::expr_ast::Visitor;
+use super::expr_ast::ExprVisitor;
 use crate::ast::expr_ast::walk_expr;
 
 // to print the ast of parsed expressions.
@@ -15,7 +15,7 @@ impl AstPrinter {
 }
 
 // implementing visitor for AstPrinter.
-impl Visitor<()> for AstPrinter {
+impl ExprVisitor<()> for AstPrinter {
     fn visit_binary_expr(&mut self, expr: &super::expr_ast::ExprBinary) {
         print!("( {} ", expr.operator.lexeme);
         walk_expr(self, &expr.left);

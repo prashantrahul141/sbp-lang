@@ -22,12 +22,12 @@ impl std::fmt::Display for Expr {
     }
 }
 
-/// Visitor trait.
+/// Visitor trait for expressions.
 /// Since we will be using visitor pattern for the expressions.
 ///
 /// When any new pass/feature we need to implement to the expressions,
 /// we just impl this visitor trait to that struct.
-pub trait Visitor<T> {
+pub trait ExprVisitor<T> {
     fn visit_binary_expr(&mut self, expr: &ExprBinary) -> T;
     fn visit_grouping_expr(&mut self, expr: &ExprGrouping) -> T;
     fn visit_literal_expr(&mut self, expr: &ExprLiteral) -> T;
@@ -38,7 +38,7 @@ pub trait Visitor<T> {
 /// # Arguments
 /// * `visitor` - The visitor struct which implements Visitor trait.
 /// * `expr` - The expression to walk.
-pub fn walk_expr<T>(visitor: &mut dyn Visitor<T>, expr: &Expr) -> T {
+pub fn walk_expr<T>(visitor: &mut dyn ExprVisitor<T>, expr: &Expr) -> T {
     match expr {
         Expr::Binary(e) => visitor.visit_binary_expr(e),
         Expr::Grouping(e) => visitor.visit_grouping_expr(e),

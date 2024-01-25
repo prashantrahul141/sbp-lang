@@ -18,20 +18,13 @@ impl App {
 
         spdlog::info!("Parsing recieved tokens.");
         let mut parser = Parser::new(tokens);
+        let statements = parser.parse();
 
-        match parser.parse() {
-            Some(expr) => {
-                if self.has_error {
-                    return;
-                }
-
-                spdlog::info!("does not have error till parsing.");
-
-                let mut interpreter = Interpreter::new();
-                let value = interpreter.interpret(expr);
-                println!("{:?}", value);
-            }
-            None => panic!("failed to parse"),
+        if self.has_error {
+            return;
         }
+
+        let mut interpreter = Interpreter::new();
+        interpreter.interpret(statements)
     }
 }
