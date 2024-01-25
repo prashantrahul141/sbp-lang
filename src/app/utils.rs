@@ -6,18 +6,34 @@ use std::sync::Arc;
 impl App {
     /// Struct method to setup global logging.
     pub fn setup_logging() {
-        let default_logger: Arc<Logger> = spdlog::default_logger();
+        if cfg!(debug_assertions) {
+            let default_logger: Arc<Logger> = spdlog::default_logger();
 
-        let log_level = match std::env::var("PROFILE")
-            .unwrap_or("release".to_owned())
-            .as_str()
-        {
-            "release" => spdlog::LevelFilter::All,
-            "debug" => spdlog::LevelFilter::All,
-            _ => spdlog::LevelFilter::All,
+            default_logger.set_level_filter(spdlog::LevelFilter::All);
+            spdlog::info!("in debug mode, defaulting log level to : All");
+        } else {
+            match spdlog::init_env_level_from("SPX_LOG") {
+                Ok(applied) => {
+                    let default_logger: Arc<Logger> = spdlog::default_logger();
+                    if applied {
+                        spdlog::info!(
+                            "Applied level from env variable to : {:?}",
+                            default_logger.level_filter()
+                        );
+                    } else {
+                        spdlog::info!("No SPX_LOG env variable was found, defaulted to : Off");
+                        default_logger.set_level_filter(spdlog::LevelFilter::Off);
+                    }
+                }
+                Err(_) => {
+                    let default_logger: Arc<Logger> = spdlog::default_logger();
+                    default_logger.set_level_filter(spdlog::LevelFilter::All);
+                    spdlog::info!(
+                        "Failed to apply log level from env variable defaulting to : All"
+                    );
+                }
+            }
         };
-
-        default_logger.set_level_filter(log_level);
     }
 
     /// Global struct method to display error, its a wrapper for App::repot()
