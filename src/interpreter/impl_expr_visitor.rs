@@ -66,8 +66,8 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
                     // arthematic operators for strings.
                     TokenType::Plus => TokenLiterals::String(format!(
                         "{}{}",
-                        left_value[1..left_value.len() - 1].to_string(),
-                        right_value[1..right_value.len() - 1].to_string(),
+                        &left_value[1..left_value.len() - 1],
+                        &right_value[1..right_value.len() - 1],
                     )),
 
                     // equality operators for strings.

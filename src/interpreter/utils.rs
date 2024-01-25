@@ -10,9 +10,9 @@ impl Interpreter {
         Self
     }
 
-    /// top level public method to start interpretion of an expression.
+    /// top level public method to start interpretion of program.
     /// # Arguments
-    /// * `expr` - The expression to interpret.
+    /// * `statements` - A vector of statements aka a program.
     pub fn interpret(&mut self, statements: Vec<Stmt>) {
         spdlog::info!("start interpreting");
         for statement in statements {
@@ -20,7 +20,9 @@ impl Interpreter {
         }
     }
 
+    /// Walks one statement at a time.
     pub fn execute(&mut self, statement: Stmt) {
+        spdlog::debug!("executing stmt : {:?}", statement);
         walk_stmt(self, &statement);
     }
 
