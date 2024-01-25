@@ -7,12 +7,13 @@ use crate::{
 impl Lexer {
     /// Creates a token for strings.
     pub fn scan_string(&mut self) {
-        // looping until another " is found or end of file is found.
         spdlog::trace!("looping to parse string token.");
+
+        // looping until another " is found or reaced end of file.
         while self.look_ahead() != '"' && !self.is_at_end() {
             // incrementing line number whenever newline is found.
             if self.look_ahead() == '\n' {
-                spdlog::trace!("found newline inside a string.");
+                spdlog::trace!("found newline inside a string, incrementing line count.");
                 self.line += 1;
             }
 
@@ -22,8 +23,7 @@ impl Lexer {
 
         // if reached the end without a "
         if self.is_at_end() {
-            spdlog::error!("found a unterminated string, returning.");
-            App::error(self.line, "Unterminated strings.".to_string());
+            App::error(self.line, "Unterminated string.".to_string());
             return;
         }
 
@@ -36,17 +36,17 @@ impl Lexer {
         self.add_token(TokenType::String, TokenLiterals::String(literal));
     }
 
-    /// Creates a token for strings.
+    /// Creates a token for numbers
     pub fn scan_number(&mut self) {
         spdlog::trace!("looping to parse number token.");
         // scan number until we dont get a character which is numeric
-        while self.look_ahead().is_numeric() {
-            // consume the numbers.
+        while Lexer::is_numeric(self.look_ahead()) {
+            // consume the numeric character.
             self.advance();
         }
 
         // for floating point numbers.
-        if self.look_ahead() == '.' && self.look_ahead_twice().is_ascii_digit() {
+        if self.look_ahead() == '.' && Lexer::is_numeric(self.look_ahead_twice()) {
             spdlog::trace!(
                 "found . && and numeric characters afterwards, parsing decimal part of the number."
             );
@@ -55,7 +55,7 @@ impl Lexer {
             self.advance();
 
             // scan number until we dont get a character which is numeric
-            while self.look_ahead().is_numeric() {
+            while Lexer::is_numeric(self.look_ahead()) {
                 // consume the numbers.
                 self.advance();
             }
@@ -74,7 +74,7 @@ impl Lexer {
             }
             Err(_) => {
                 // printing a error and skipping the token all together.
-                spdlog::error!("failed to parse number string to f64 float.");
+                App::error(self.line, "failed to parse into number.".to_string());
             }
         }
     }
@@ -83,7 +83,7 @@ impl Lexer {
     pub fn scan_indentifier(&mut self) {
         spdlog::trace!("parsing an identifer.");
         while Lexer::is_alphanumeric(self.look_ahead()) {
-            spdlog::trace!("found another alphanumber, advancing.");
+            spdlog::trace!("found another alphanumeric char, advancing.");
             self.advance();
         }
 
@@ -98,8 +98,10 @@ impl Lexer {
                 self.add_basic_token(reserved_keyword_type.clone());
             }
             None => {
-                spdlog::trace!("No match found for : {}", lexeme);
-                spdlog::trace!("adding token as identifer");
+                spdlog::trace!(
+                    "No match found for : {}, adding token as identifer.",
+                    lexeme
+                );
                 self.add_basic_token(TokenType::Identifier)
             }
         }

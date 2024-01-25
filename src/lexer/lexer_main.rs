@@ -26,9 +26,9 @@ pub struct Lexer {
 }
 
 impl Lexer {
-    /// The main function to scan each individual tokens and call functions accordingly.
+    /// scans individual tokens and add them into lexer's tokens vector.
     pub fn scan_token(&mut self) {
-        // consume next token.
+        // consume current char.
         let current_char = self.advance();
 
         match current_char {
@@ -90,10 +90,12 @@ impl Lexer {
             }
 
             // longer lexemes
-            // comments
+            // /
             '/' => {
                 if self.match_char('/') {
-                    // keep consuming characters untill we reach the end of file or newline.
+                    // if the line is infact a comment.
+                    // keep consuming characters untill we reach the end of file
+                    // or end of the line.
                     while self.look_ahead() != '\n' && !self.is_at_end() {
                         self.advance();
                     }
@@ -109,32 +111,34 @@ impl Lexer {
                 spdlog::trace!("ignoring whitespaces");
             }
 
-            // newline, its basically a single line character.
+            // newlines, we ignore it, but also increase our line count.
             '\n' => {
                 self.line += 1;
                 spdlog::trace!("found newline, incrementing line number and skipping.");
             }
 
-            // strings!.
+            // strings.
             '"' => {
                 spdlog::trace!("scanning a string token.");
                 self.scan_string();
             }
 
-            // reporting error but keep scanning if found an unexpected character.
+            // all other types of tokens, this includes literal number and identifiers.
+            // we also show an error if we found a character we dont recognize.
             _ => {
+                // incase the token starts with a number, then its probably a number.
                 if Lexer::is_numeric(current_char) {
                     spdlog::trace!("trying to parse a number.");
                     self.scan_number();
-                } else if Lexer::is_alpha(current_char) {
+                }
+                // incase the token starts with a alphabet, then its probably a identifier.
+                else if Lexer::is_alpha(current_char) {
                     spdlog::trace!("trying to parse an indentifier.");
                     self.scan_indentifier();
-                } else {
-                    spdlog::error!(
-                        "unexpected character : {} at line : {}",
-                        current_char,
-                        self.line
-                    );
+                }
+                // it is safe to assume anything else cannot be considered a safe token
+                // to parse or interpret.
+                else {
                     App::error(
                         self.line,
                         format!("unexpected character : {}", current_char),

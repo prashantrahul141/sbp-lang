@@ -7,7 +7,8 @@ pub struct AstPrinter;
 impl AstPrinter {
     #[allow(dead_code)]
     // this is a debug only struct, we might not want to always create the
-    // AST tree string representation, which can result int poor performance.
+    // AST tree string representation, which can result in poor performance,
+    // so disable dead code lint here.
     pub fn new() -> Self {
         Self
     }
@@ -23,18 +24,18 @@ impl Visitor<()> for AstPrinter {
     }
 
     fn visit_grouping_expr(&mut self, expr: &super::ast_tree::ExprGrouping) {
-        print!("( group ");
+        print!("( group");
         walk_expr(self, &expr.expression);
-        print!(" )");
+        print!(")");
     }
 
     fn visit_literal_expr(&mut self, expr: &super::ast_tree::ExprLiteral) {
-        print!("{}", expr.value);
+        print!(" {} ", expr.value);
     }
 
     fn visit_unary_expr(&mut self, expr: &super::ast_tree::ExprUnary) {
-        print!("( {} ", expr.operator.lexeme);
+        print!("( {}", expr.operator.lexeme);
         walk_expr(self, &expr.right);
-        print!(" )");
+        print!(")");
     }
 }

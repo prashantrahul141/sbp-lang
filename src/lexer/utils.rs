@@ -35,16 +35,28 @@ impl Lexer {
     /// # Arguments
     /// * `expected` - a character which needs to be matched against next character.
     pub fn match_char(&mut self, expected: char) -> bool {
+        spdlog::trace!(
+            "trying to match current character with expected : {}",
+            expected
+        );
+
         // check if reached the end.
         if self.is_at_end() {
+            spdlog::trace!("reached end match failed.");
             return false;
         }
 
         // false if the next char is not expected.
         if self.source_chars[self.current] != expected {
+            spdlog::trace!(
+                "failed match with current : {}, expected : {}",
+                self.source_chars[self.current],
+                expected
+            );
             return false;
         }
 
+        spdlog::trace!("match passed, consuming it.");
         // only consume the character if it does matches the expected character.
         self.current += 1;
         true

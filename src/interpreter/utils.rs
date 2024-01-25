@@ -24,9 +24,13 @@ impl Interpreter {
     pub fn is_truth(&self, token_literal: TokenLiterals) -> TokenLiterals {
         spdlog::trace!("checking truthy for literal : {}", token_literal);
         match token_literal {
-            TokenLiterals::Boolean(value) => TokenLiterals::Boolean(!value),
+            // any boolean is just it's value.
+            TokenLiterals::Boolean(_) => token_literal,
+            // any number is true except 0.
             TokenLiterals::Number(value) => TokenLiterals::Boolean(value != 0_f64),
+            // any null type token literal are straigth up false.
             TokenLiterals::Null => TokenLiterals::Boolean(false),
+            // any string is true unless is empty.
             TokenLiterals::String(value) => TokenLiterals::Boolean(!value.is_empty()),
         }
     }
