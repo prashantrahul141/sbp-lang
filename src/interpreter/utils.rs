@@ -1,4 +1,4 @@
-use super::interpreter_main::Interpreter;
+use super::{environment::Environment, interpreter_main::Interpreter};
 use crate::{
     ast::stmt_ast::{walk_stmt, Stmt},
     token::token_main::TokenLiterals,
@@ -7,7 +7,10 @@ use crate::{
 impl Interpreter {
     /// Constructor for Interpreter.
     pub fn new() -> Self {
-        Self
+        spdlog::debug!("constructing new interpreter.");
+        Self {
+            environment: Environment::new(),
+        }
     }
 
     /// top level public method to start interpretion of program.
