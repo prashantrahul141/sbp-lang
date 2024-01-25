@@ -1,6 +1,6 @@
 use super::interpreter_main::Interpreter;
 use crate::{
-    ast::expr_ast::{walk_expr, Expr},
+    ast::stmt_ast::{walk_stmt, Stmt},
     token::token_main::TokenLiterals,
 };
 
@@ -13,9 +13,15 @@ impl Interpreter {
     /// top level public method to start interpretion of an expression.
     /// # Arguments
     /// * `expr` - The expression to interpret.
-    pub fn interpret(&mut self, expr: Expr) -> TokenLiterals {
+    pub fn interpret(&mut self, statements: Vec<Stmt>) {
         spdlog::info!("start interpreting");
-        walk_expr(self, &expr)
+        for statement in statements {
+            self.execute(statement);
+        }
+    }
+
+    pub fn execute(&mut self, statement: Stmt) {
+        walk_stmt(self, &statement);
     }
 
     /// Splax core logic which defines what is truth?
