@@ -1,9 +1,16 @@
+use std::vec;
+
 use crate::{
+    app::app_main::App,
     ast::{
-        expr_ast::{Expr, ExprBinary, ExprGrouping, ExprLiteral, ExprUnary},
-        stmt_ast::{Stmt, StmtExpr, StmtPrint},
+        expr_ast::{Expr, ExprBinary, ExprGrouping, ExprLiteral, ExprUnary, ExprVariable},
+        stmt_ast::{Stmt, StmtExpr, StmtLet, StmtPrint},
     },
-    token::{token_main::Token, token_types::TokenType},
+    token::{
+        self,
+        token_main::{Token, TokenLiterals},
+        token_types::TokenType,
+    },
 };
 
 /// Top level parser struct.
@@ -14,17 +21,73 @@ pub struct Parser {
     pub current: usize,
 }
 
-/// methods to resolve each type of expressions.
 impl Parser {
+    /// Top level method which handles all parsing and returns vec
+    /// of statements. Skips the statements which found to be faulty,
+    /// while giving user errors.
     pub fn parse(&mut self) -> Vec<Stmt> {
         let mut statements = vec![];
+        spdlog::debug!("Starting parsing.");
+
         while !self.is_at_end() {
-            statements.push(self.statement());
+            match self.declaration() {
+                Some(statement) => statements.push(statement),
+                None => {
+                    App::error(
+                        self.tokens[self.current].line,
+                        "Failed to parse statement".to_string(),
+                    );
+                    self.synchronize();
+                }
+            }
         }
         statements
     }
 
-    pub fn statement(&mut self) -> Stmt {
+    /// Parses declarations
+    pub fn declaration(&mut self) -> Option<Stmt> {
+        spdlog::debug!("parsing a declaration.");
+        if self.match_token(vec![TokenType::Let]) {
+            return self.let_declaration();
+        }
+
+        self.statement()
+    }
+
+    /// Parses let type of declarations
+    pub fn let_declaration(&mut self) -> Option<Stmt> {
+        spdlog::debug!("parsing a Let declaration.");
+        let name = match self.consume(TokenType::Identifier, "Expect variable name.".to_string()) {
+            Some(name) => name,
+            None => return None,
+        }
+        .to_owned();
+
+        if self.match_token(vec![TokenType::Equal]) {
+            if let Some(initialiser) = self.expression() {
+                self.consume(
+                    TokenType::Semicolon,
+                    "Expected ';' after value.".to_string(),
+                );
+                return Some(Stmt::Let(Box::new(StmtLet { name, initialiser })));
+            }
+        } else {
+            self.consume(
+                TokenType::Semicolon,
+                "Expected ';' after value.".to_string(),
+            );
+            let initialiser = Expr::Literal(Box::new(ExprLiteral {
+                value: TokenLiterals::Null,
+            }));
+            return Some(Stmt::Let(Box::new(StmtLet { name, initialiser })));
+        }
+
+        None
+    }
+
+    /// Parses statement if not a declaration.
+    pub fn statement(&mut self) -> Option<Stmt> {
+        spdlog::debug!("parsing a statement.");
         if self.match_token(vec![TokenType::Print]) {
             return self.print_statement();
         }
@@ -32,29 +95,35 @@ impl Parser {
         self.expression_statement()
     }
 
-    pub fn print_statement(&mut self) -> Stmt {
+    /// parses print type of statement
+    pub fn print_statement(&mut self) -> Option<Stmt> {
+        spdlog::debug!("parsing a Let declaration.");
         let expr = self.expression();
         self.consume(
             TokenType::Semicolon,
             "Expected ';' after value.".to_string(),
         );
-        match expr {
-            Some(expr) => Stmt::Print(Box::new(StmtPrint { expr })),
-            None => todo!(),
+        if let Some(expr) = expr {
+            return Some(Stmt::Print(Box::new(StmtPrint { expr })));
         }
+
+        None
     }
 
-    pub fn expression_statement(&mut self) -> Stmt {
+    // parses expression type of statement.
+    pub fn expression_statement(&mut self) -> Option<Stmt> {
+        spdlog::debug!("parsing a expression statement.");
         let expr = self.expression();
         self.consume(
             TokenType::Semicolon,
             "Expected ';' after expression.".to_string(),
         );
 
-        match expr {
-            Some(expr) => Stmt::Expr(Box::new(StmtExpr { expr })),
-            None => todo!(),
+        if let Some(expr) = expr {
+            return Some(Stmt::Expr(Box::new(StmtExpr { expr })));
         }
+
+        None
     }
 
     /// Parsing method for expressions.
@@ -182,7 +251,7 @@ impl Parser {
         if self.match_token(vec![TokenType::False]) {
             spdlog::trace!("matched literal: False");
             return Some(Expr::Literal(Box::new(ExprLiteral {
-                value: crate::token::token_main::TokenLiterals::Boolean(false),
+                value: token::token_main::TokenLiterals::Boolean(false),
             })));
         }
 
@@ -190,7 +259,7 @@ impl Parser {
         if self.match_token(vec![TokenType::True]) {
             spdlog::trace!("matched literal: True");
             return Some(Expr::Literal(Box::new(ExprLiteral {
-                value: crate::token::token_main::TokenLiterals::Boolean(true),
+                value: token::token_main::TokenLiterals::Boolean(true),
             })));
         }
 
@@ -198,7 +267,7 @@ impl Parser {
         if self.match_token(vec![TokenType::Null]) {
             spdlog::trace!("matched literal: Null");
             return Some(Expr::Literal(Box::new(ExprLiteral {
-                value: crate::token::token_main::TokenLiterals::Null,
+                value: token::token_main::TokenLiterals::Null,
             })));
         }
 
@@ -206,9 +275,7 @@ impl Parser {
         if self.match_token(vec![TokenType::String]) {
             spdlog::trace!("matched literal: String");
             return Some(Expr::Literal(Box::new(ExprLiteral {
-                value: crate::token::token_main::TokenLiterals::String(
-                    self.previous().lexeme.to_owned(),
-                ),
+                value: token::token_main::TokenLiterals::String(self.previous().lexeme.to_owned()),
             })));
         }
 
@@ -216,12 +283,18 @@ impl Parser {
         if self.match_token(vec![TokenType::Number]) {
             spdlog::trace!("matched literal: Number");
             return Some(Expr::Literal(Box::new(ExprLiteral {
-                value: crate::token::token_main::TokenLiterals::Number(
-                    match self.previous().literal {
-                        crate::token::token_main::TokenLiterals::Number(v) => v,
-                        _ => 0_f64,
-                    },
-                ),
+                value: token::token_main::TokenLiterals::Number(match self.previous().literal {
+                    token::token_main::TokenLiterals::Number(v) => v,
+                    _ => 0_f64,
+                }),
+            })));
+        }
+
+        // variable indentifiers.
+        if self.match_token(vec![TokenType::Identifier]) {
+            spdlog::trace!("matched literal: Identifier");
+            return Some(Expr::Variable(Box::new(ExprVariable {
+                name: self.previous().to_owned(),
             })));
         }
 
