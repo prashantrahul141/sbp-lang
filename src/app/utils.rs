@@ -8,7 +8,6 @@ impl App {
     pub fn setup_logging() {
         if cfg!(debug_assertions) {
             let default_logger: Arc<Logger> = spdlog::default_logger();
-
             default_logger.set_level_filter(spdlog::LevelFilter::All);
             spdlog::info!("in debug mode, defaulting log level to : All");
         } else {
@@ -21,7 +20,6 @@ impl App {
                             default_logger.level_filter()
                         );
                     } else {
-                        spdlog::info!("No SPX_LOG env variable was found, defaulted to : Off");
                         default_logger.set_level_filter(spdlog::LevelFilter::Off);
                     }
                 }

@@ -14,17 +14,18 @@ impl Visitor<TokenLiterals> for Interpreter {
     /// * `expr` - Binary Expression.
     fn visit_binary_expr(&mut self, expr: &crate::ast::ast_tree::ExprBinary) -> TokenLiterals {
         let left = walk_expr(self, &expr.left);
+        let operator = &expr.operator;
         let right = walk_expr(self, &expr.right);
 
         spdlog::debug!("interpreting binary expression: {:?}", expr);
 
-        // matching right literal.
-        match right {
-            // when right literal is number.
-            TokenLiterals::Number(right_value) => match left {
-                // when left literal is also number.
-                TokenLiterals::Number(left_value) => match expr.operator.token_type {
-                    // arithematic operation when both are numbers.
+        // matching left operand.
+        match left {
+            // if left operand is a number.
+            TokenLiterals::Number(left_value) => match right {
+                // when both left and right operands are numbers.
+                TokenLiterals::Number(right_value) => match operator.token_type {
+                    // Operators supported by two number operands.
                     TokenType::Plus => TokenLiterals::Number(left_value + right_value),
                     TokenType::Minus => TokenLiterals::Number(left_value - right_value),
                     TokenType::Star => TokenLiterals::Number(left_value * right_value),
@@ -42,103 +43,92 @@ impl Visitor<TokenLiterals> for Interpreter {
 
                     // any other operators are not for number.
                     _ => {
+                        App::runtime_error(
+                            operator.line,
+                            "unsupported operator for 'Number'".to_string(),
+                        );
                         panic!("This is unreachable, if somehow you managed to trigger this, idk.")
                     }
-                },
+                }, // operator matching for both operands number types.
 
-                // when left is not a number type, while right one is.
+                // any other type when the left operand is a number will result in a runtime errror.
                 _ => {
                     App::runtime_error(
-                        expr.operator.line,
-                        format!(
-                            "'{}' operator cannot be used with '{}' type.",
-                            expr.operator.lexeme, left,
-                        ),
+                        operator.line,
+                        "unsupported operand type(s): 'Number' with a non 'Number'".to_string(),
                     );
                     panic!();
                 }
-            },
+            }, // left operand matching: Number,
 
-            // when right literal is a string.
-            TokenLiterals::String(right_value) => match left {
-                // when left literal is also a string.
-                TokenLiterals::String(left_value) => match expr.operator.token_type {
+            // when left operand is a string.
+            TokenLiterals::String(left_value) => match right {
+                // when both left and right operands are strings.
+                TokenLiterals::String(right_value) => match operator.token_type {
                     // arthematic operators for strings.
                     TokenType::Plus => TokenLiterals::String(format!(
                         "{}{}",
-                        &left_value[1..left_value.len() - 1],
-                        &right_value[1..right_value.len() - 1],
+                        left_value[1..left_value.len() - 1].to_string(),
+                        right_value[1..right_value.len() - 1].to_string(),
                     )),
 
                     // equality operators for strings.
                     TokenType::BangEqual => TokenLiterals::Boolean(left_value != right_value),
                     TokenType::EqualEqual => TokenLiterals::Boolean(left_value == right_value),
 
-                    // any other operator is not for strings.
+                    // any other operators are not for strings.
                     _ => {
                         App::runtime_error(
-                            expr.operator.line,
-                            format!(
-                                "{} operator is not supported between Strings.",
-                                expr.operator.lexeme
-                            ),
+                            operator.line,
+                            "unsupported operator for 'String'".to_string(),
                         );
-                        panic!();
+                        panic!()
                     }
-                },
+                }, // operator matching for both operands string types.
 
-                // when left is not a string type, while right one is.
+                // any other type when the left operand is a string will result in a runtime errror.
                 _ => {
                     App::runtime_error(
-                        expr.operator.line,
-                        format!(
-                            "'{}' operator cannot be used with type 'String' and '{}' type.",
-                            expr.operator.lexeme, left,
-                        ),
+                        operator.line,
+                        "unsupported operand type(s): 'String' with a non 'String'".to_string(),
                     );
-                    panic!();
+                    panic!()
                 }
             },
 
-            // when right literal is a boolean.
-            TokenLiterals::Boolean(right_value) => match left {
-                // when left literal is also a boolean.
-                TokenLiterals::Boolean(left_value) => match expr.operator.token_type {
+            TokenLiterals::Boolean(left_value) => match right {
+                TokenLiterals::Boolean(right_value) => match operator.token_type {
                     // equality operators for booleans.
                     TokenType::BangEqual => TokenLiterals::Boolean(left_value != right_value),
                     TokenType::EqualEqual => TokenLiterals::Boolean(left_value == right_value),
+
+                    // any other operators are not for booleans.
                     _ => {
                         App::runtime_error(
-                            expr.operator.line,
-                            format!(
-                                "{} operator is not supported between Booleans.",
-                                expr.operator.lexeme
-                            ),
+                            operator.line,
+                            "unsupported operator for 'Boolean'".to_string(),
                         );
-                        panic!();
+                        panic!()
                     }
-                },
+                }, // operator matching for both operands boolean types.
 
-                // when left is not a boolean type, while right one is.
+                // any other type when the left operand is a boolean will result in a runtime errror.
                 _ => {
                     App::runtime_error(
-                        expr.operator.line,
-                        format!(
-                            "'{}' operator cannot be used with type 'String' and '{}' type.",
-                            expr.operator.lexeme, left,
-                        ),
+                        operator.line,
+                        "unsupported operand type(s): 'Boolean' with a non 'Boolean'".to_string(),
                     );
-                    panic!();
+                    panic!()
                 }
             },
 
-            // when right literal is neither string or number.
+            // when right literal is neither number nor string nor boolean.
             _ => {
                 App::runtime_error(
-                    expr.operator.line,
-                    format!("undefined type for '{}' operator.", expr.operator.lexeme),
+                    operator.line,
+                    "unsupported operation for this type".to_string(),
                 );
-                panic!();
+                panic!()
             }
         }
     }
