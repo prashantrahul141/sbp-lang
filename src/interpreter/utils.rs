@@ -1,6 +1,6 @@
 use super::interpreter_main::Interpreter;
 use crate::{
-    ast::ast_tree::{walk_expr, Expr},
+    ast::expr_ast::{walk_expr, Expr},
     token::token_main::TokenLiterals,
 };
 

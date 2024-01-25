@@ -1,6 +1,6 @@
 use crate::{
     app::app_main::App,
-    ast::ast_tree::{walk_expr, Visitor},
+    ast::expr_ast::{walk_expr, Visitor},
     token::{token_main::TokenLiterals, token_types::TokenType},
 };
 
@@ -12,7 +12,7 @@ impl Visitor<TokenLiterals> for Interpreter {
     /// Evalute binary expressions.
     /// # Arguments
     /// * `expr` - Binary Expression.
-    fn visit_binary_expr(&mut self, expr: &crate::ast::ast_tree::ExprBinary) -> TokenLiterals {
+    fn visit_binary_expr(&mut self, expr: &crate::ast::expr_ast::ExprBinary) -> TokenLiterals {
         let left = walk_expr(self, &expr.left);
         let operator = &expr.operator;
         let right = walk_expr(self, &expr.right);
@@ -136,7 +136,7 @@ impl Visitor<TokenLiterals> for Interpreter {
     /// Evalute group expressions.
     /// # Arguments
     /// * `expr` - Grouping Expression.
-    fn visit_grouping_expr(&mut self, expr: &crate::ast::ast_tree::ExprGrouping) -> TokenLiterals {
+    fn visit_grouping_expr(&mut self, expr: &crate::ast::expr_ast::ExprGrouping) -> TokenLiterals {
         spdlog::trace!("interpreting grouping expression: {:?}", expr);
         walk_expr(self, &expr.expression)
     }
@@ -144,7 +144,7 @@ impl Visitor<TokenLiterals> for Interpreter {
     /// Evalute literal expressions.
     /// # Arguments
     /// * `expr` - literal Expression.
-    fn visit_literal_expr(&mut self, expr: &crate::ast::ast_tree::ExprLiteral) -> TokenLiterals {
+    fn visit_literal_expr(&mut self, expr: &crate::ast::expr_ast::ExprLiteral) -> TokenLiterals {
         spdlog::trace!("interpreting literal expression: {:?}", expr);
         expr.value.to_owned()
     }
@@ -152,7 +152,7 @@ impl Visitor<TokenLiterals> for Interpreter {
     /// Evalute unary expressions.
     /// # Arguments
     /// * `expr` - Unary expression.
-    fn visit_unary_expr(&mut self, expr: &crate::ast::ast_tree::ExprUnary) -> TokenLiterals {
+    fn visit_unary_expr(&mut self, expr: &crate::ast::expr_ast::ExprUnary) -> TokenLiterals {
         spdlog::trace!("interpreting unary expression: {:?}", expr);
         let right = walk_expr(self, &expr.right);
 

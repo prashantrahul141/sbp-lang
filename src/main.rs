@@ -23,7 +23,7 @@ mod token {
 
 mod ast {
     pub mod ast_printer;
-    pub mod ast_tree;
+    pub mod expr_ast;
 }
 
 mod parser {
