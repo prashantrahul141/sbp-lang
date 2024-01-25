@@ -1,5 +1,8 @@
 use crate::{
-    ast::expr_ast::{Expr, ExprBinary, ExprGrouping, ExprLiteral, ExprUnary},
+    ast::{
+        expr_ast::{Expr, ExprBinary, ExprGrouping, ExprLiteral, ExprUnary},
+        stmt_ast::{Stmt, StmtExpr, StmtPrint},
+    },
     token::{token_main::Token, token_types::TokenType},
 };
 
@@ -13,8 +16,45 @@ pub struct Parser {
 
 /// methods to resolve each type of expressions.
 impl Parser {
-    pub fn parse(&mut self) -> Option<Expr> {
-        self.expression()
+    pub fn parse(&mut self) -> Vec<Stmt> {
+        let mut statements = vec![];
+        while !self.is_at_end() {
+            statements.push(self.statement());
+        }
+        statements
+    }
+
+    pub fn statement(&mut self) -> Stmt {
+        if self.match_token(vec![TokenType::Print]) {
+            return self.print_statement();
+        }
+
+        self.expression_statement()
+    }
+
+    pub fn print_statement(&mut self) -> Stmt {
+        let expr = self.expression();
+        self.consume(
+            TokenType::Semicolon,
+            "Expected ';' after value.".to_string(),
+        );
+        match expr {
+            Some(expr) => Stmt::Print(Box::new(StmtPrint { expr })),
+            None => todo!(),
+        }
+    }
+
+    pub fn expression_statement(&mut self) -> Stmt {
+        let expr = self.expression();
+        self.consume(
+            TokenType::Semicolon,
+            "Expected ';' after expression.".to_string(),
+        );
+
+        match expr {
+            Some(expr) => Stmt::Expr(Box::new(StmtExpr { expr })),
+            None => todo!(),
+        }
     }
 
     /// Parsing method for expressions.

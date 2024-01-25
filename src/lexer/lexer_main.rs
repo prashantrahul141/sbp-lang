@@ -136,8 +136,7 @@ impl Lexer {
                     spdlog::trace!("trying to parse an indentifier.");
                     self.scan_indentifier();
                 }
-                // it is safe to assume anything else cannot be considered a safe token
-                // to parse or interpret.
+                // it is safe to assume anything else cannot be considered a safe token to parse or interpret.
                 else {
                     App::error(
                         self.line,
