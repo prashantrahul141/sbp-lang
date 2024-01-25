@@ -161,7 +161,7 @@ impl Visitor<TokenLiterals> for Interpreter {
                 TokenLiterals::Number(value) => TokenLiterals::Number(-value),
                 _ => right,
             },
-            TokenType::Bang => self.is_truth(right),
+            TokenType::Bang => TokenLiterals::Boolean(!self.is_truth(right)),
             _ => right,
         }
     }
