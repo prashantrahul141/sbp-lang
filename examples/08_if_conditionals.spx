@@ -16,3 +16,22 @@ if (a == b) {
 } else {
     print "FALSE";
 }
+
+
+// more conditionals with logical operations.
+
+if (true and true) {
+    print "true and true is infact true"; 
+} 
+
+if (false and true) {
+    print "this is never going to get printed";
+}
+
+if (true or true) {
+    print "true or true is true.";
+}
+
+if (true or false) {
+    print "true and false is still true";
+}

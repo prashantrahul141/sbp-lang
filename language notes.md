@@ -34,7 +34,11 @@ block         ->     "{" declaration* "}" ;
 
 expression    ->     assignment;
 
-assignment    ->     INDENTIFIER "=" assignment | equality ;
+assignment    ->     INDENTIFIER "=" assignment | logic_or ;
+
+logic_or      ->     logic_and ( "or" logic_and )* ;
+
+logic_and     ->     equality ( "and" equality )* ;
 
 equality      ->     comparison ( ( "!=" | "==" ) comparison )* ;
 
