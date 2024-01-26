@@ -50,7 +50,7 @@ impl StmtVisitor for Interpreter {
         spdlog::debug!("executing if block, evaluated condition : {evaluated_condition}");
 
         // check truthy for the token literal.
-        if self.is_truth(evaluated_condition) {
+        if Interpreter::is_truth(evaluated_condition) {
             spdlog::trace!("executing then branch.");
             // execute then block if token literal is truthy
             self.execute(&stmt.then_branch);
@@ -60,6 +60,15 @@ impl StmtVisitor for Interpreter {
             if let Some(else_branch) = &stmt.else_branch {
                 self.execute(else_branch);
             }
+        }
+    }
+
+    /// method walks/executes while statements.
+    /// # Arguments
+    /// * `stmt` - stmtwhile stmt to walk.
+    fn visit_while_stmt(&mut self, stmt: &ast::stmt_ast::StmtWhile) {
+        while Interpreter::is_truth(walk_expr(self, &stmt.condition)) {
+            self.execute(&stmt.body);
         }
     }
 }
