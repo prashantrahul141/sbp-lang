@@ -340,7 +340,7 @@ impl Parser {
     pub fn factor(&mut self) -> Option<Expr> {
         spdlog::trace!("parsing factor");
         if let Some(left) = self.unary() {
-            while self.match_token(vec![TokenType::Slash, TokenType::Star]) {
+            while self.match_token(vec![TokenType::Slash, TokenType::Star, TokenType::Mod]) {
                 let operator = self.previous().clone();
                 if let Some(right) = self.unary() {
                     return Some(Expr::Binary(Box::new(ExprBinary {

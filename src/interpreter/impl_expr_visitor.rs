@@ -41,6 +41,7 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
                     TokenType::Minus => TokenLiterals::Number(left_value - right_value),
                     TokenType::Star => TokenLiterals::Number(left_value * right_value),
                     TokenType::Slash => TokenLiterals::Number(left_value / right_value),
+                    TokenType::Mod => TokenLiterals::Number(left_value % right_value),
 
                     // comparison operator.
                     TokenType::Greater => TokenLiterals::Boolean(left_value > right_value),

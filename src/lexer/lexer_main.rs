@@ -43,6 +43,7 @@ impl Lexer {
             '+' => self.add_basic_token(TokenType::Plus),
             ';' => self.add_basic_token(TokenType::Semicolon),
             '*' => self.add_basic_token(TokenType::Star),
+            '%' => self.add_basic_token(TokenType::Mod),
 
             // multiple character basic tokens.
             // !
