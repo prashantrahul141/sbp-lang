@@ -173,7 +173,7 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
                 TokenLiterals::Number(value) => TokenLiterals::Number(-value),
                 _ => right,
             },
-            TokenType::Bang => TokenLiterals::Boolean(!self.is_truth(right)),
+            TokenType::Bang => TokenLiterals::Boolean(!Interpreter::is_truth(right)),
             _ => right,
         }
     }
@@ -196,14 +196,14 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
             // in case of "OR", we check if left operand is true,
             // if is is true, then we dont need to check the right operand as well
             // we can safely assume that the entire expression will be true.
-            if self.is_truth(left.clone()) {
+            if Interpreter::is_truth(left.clone()) {
                 return left;
             }
         } else {
             // in case of "AND", we check if left operand is false,
             // if is is false, then we dont need to check the right operand as well
             // we can safely assume that the entire expression will be false.
-            if !self.is_truth(left.clone()) {
+            if !Interpreter::is_truth(left.clone()) {
                 return left;
             }
         }
