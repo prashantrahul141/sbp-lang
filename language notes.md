@@ -23,7 +23,10 @@ declaration   ->     varDecl
 varDecl       ->     "let" IDENTIFIER ( "=" expression )? ";" ;
 
 statement     ->     exprStmt
-                   | printStmt ;
+                   | printStmt
+                   | block ;
+
+block         ->     "{" declaration* "}" ;
 
 expression    ->     assignment;
 
