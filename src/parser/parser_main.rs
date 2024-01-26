@@ -1,10 +1,12 @@
+use std::vec;
+
 use crate::{
     app::app_main::App,
     ast::{
         expr_ast::{
             Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprUnary, ExprVariable,
         },
-        stmt_ast::{Stmt, StmtBlock, StmtExpr, StmtLet, StmtPrint},
+        stmt_ast::{Stmt, StmtBlock, StmtExpr, StmtIf, StmtLet, StmtPrint},
     },
     token::{
         self,
@@ -99,7 +101,44 @@ impl Parser {
             })));
         }
 
+        if self.match_token(vec![TokenType::If]) {
+            return self.if_statement();
+        }
+
         self.expression_statement()
+    }
+
+    /// parses if type of statement
+    pub fn if_statement(&mut self) -> Option<Stmt> {
+        self.consume(TokenType::LeftParen, "expected '(' after 'if'".to_string());
+        // the condition inside 'if ()'
+        let condition = match self.expression() {
+            Some(condition) => condition,
+            None => return None,
+        };
+
+        self.consume(
+            TokenType::RightParen,
+            "expected ')' after 'condition'".to_string(),
+        );
+
+        // block inside if condition tree.
+        let then_branch = match self.statement() {
+            Some(statement) => statement,
+            None => return None,
+        };
+
+        // optional else branch.
+        let mut else_branch: Option<Stmt> = None;
+        if self.match_token(vec![TokenType::Else]) {
+            else_branch = self.statement();
+        }
+
+        Some(Stmt::If(Box::new(StmtIf {
+            condition,
+            then_branch,
+            else_branch,
+        })))
     }
 
     /// parses print type of statement
