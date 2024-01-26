@@ -1,0 +1,18 @@
+let a = 1;
+let b = 2;
+
+if (a == b) {
+    print "TRUE";
+} else {
+    print "FALSE"; // false
+}
+
+
+a = 1;
+b = 1;
+
+if (a == b) {
+    print "TRUE"; // true
+} else {
+    print "FALSE";
+}
