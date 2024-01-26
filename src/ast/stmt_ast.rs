@@ -10,6 +10,7 @@ pub enum Stmt {
     If(Box<StmtIf>),
     Print(Box<StmtPrint>),
     Let(Box<StmtLet>),
+    While(Box<StmtWhile>),
 }
 
 /// Visitor trait for statements.
@@ -23,6 +24,7 @@ pub trait StmtVisitor {
     fn visit_print_stmt(&mut self, stmt: &StmtPrint);
     fn visit_let_stmt(&mut self, stmt: &StmtLet);
     fn visit_if_stmt(&mut self, stmt: &StmtIf);
+    fn visit_while_stmt(&mut self, stmt: &StmtWhile);
 }
 
 /// Walker, in other implementation this will be called `accept`.
@@ -36,6 +38,7 @@ pub fn walk_stmt(visitor: &mut dyn StmtVisitor, stmt: &Stmt) {
         Stmt::Print(stmt) => visitor.visit_print_stmt(stmt),
         Stmt::Let(stmt) => visitor.visit_let_stmt(stmt),
         Stmt::If(stmt) => visitor.visit_if_stmt(stmt),
+        Stmt::While(stmt) => visitor.visit_while_stmt(stmt),
     }
 }
 
@@ -56,9 +59,11 @@ pub struct StmtExpr {
 /// Grammer for stmtif statemments.
 #[derive(Debug)]
 pub struct StmtIf {
-    // the expression itself.
+    // condition of if statement.
     pub condition: Expr,
+    // then branch of if statement.
     pub then_branch: Stmt,
+    // else branch of if statement.
     pub else_branch: Option<Stmt>,
 }
 
@@ -76,4 +81,13 @@ pub struct StmtLet {
     pub name: Token,
     // init expr value of the binding.
     pub initialiser: Expr,
+}
+
+/// Grammer for stmtwhile statemments.
+#[derive(Debug)]
+pub struct StmtWhile {
+    // condition of while statement.
+    pub condition: Expr,
+    // then branch of while statement.
+    pub body: Stmt,
 }
