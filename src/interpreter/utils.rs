@@ -48,7 +48,7 @@ impl Interpreter {
     /// Walks one statement at a time.
     pub fn execute(&mut self, statement: &Stmt) {
         spdlog::debug!("executing stmt : {:?}", statement);
-        walk_stmt(self, &statement);
+        walk_stmt(self, statement);
     }
 
     /// Splax core logic which defines what is truth?

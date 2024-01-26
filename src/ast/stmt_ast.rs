@@ -7,6 +7,7 @@ use super::expr_ast::Expr;
 pub enum Stmt {
     Block(Box<StmtBlock>),
     Expr(Box<StmtExpr>),
+    If(Box<StmtIf>),
     Print(Box<StmtPrint>),
     Let(Box<StmtLet>),
 }
@@ -21,6 +22,7 @@ pub trait StmtVisitor {
     fn visit_expression_stmt(&mut self, stmt: &StmtExpr);
     fn visit_print_stmt(&mut self, stmt: &StmtPrint);
     fn visit_let_stmt(&mut self, stmt: &StmtLet);
+    fn visit_if_stmt(&mut self, stmt: &StmtIf);
 }
 
 /// Walker, in other implementation this will be called `accept`.
@@ -33,6 +35,7 @@ pub fn walk_stmt(visitor: &mut dyn StmtVisitor, stmt: &Stmt) {
         Stmt::Expr(stmt) => visitor.visit_expression_stmt(stmt),
         Stmt::Print(stmt) => visitor.visit_print_stmt(stmt),
         Stmt::Let(stmt) => visitor.visit_let_stmt(stmt),
+        Stmt::If(stmt) => visitor.visit_if_stmt(stmt),
     }
 }
 
@@ -48,6 +51,15 @@ pub struct StmtBlock {
 pub struct StmtExpr {
     // the expression itself.
     pub expr: Expr,
+}
+
+/// Grammer for stmtif statemments.
+#[derive(Debug)]
+pub struct StmtIf {
+    // the expression itself.
+    pub condition: Expr,
+    pub then_branch: Stmt,
+    pub else_branch: Option<Stmt>,
 }
 
 /// Grammer for stmtprint statemments.
