@@ -7,7 +7,7 @@ use crate::{
             Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary,
             ExprVariable,
         },
-        stmt_ast::{Stmt, StmtBlock, StmtExpr, StmtIf, StmtLet, StmtPrint},
+        stmt_ast::{Stmt, StmtBlock, StmtExpr, StmtIf, StmtLet, StmtPrint, StmtWhile},
     },
     token::{
         self,
@@ -92,21 +92,54 @@ impl Parser {
     /// Parses statement if not a declaration.
     pub fn statement(&mut self) -> Option<Stmt> {
         spdlog::debug!("parsing a statement.");
+        // while print indentifier is found.
         if self.match_token(vec![TokenType::Print]) {
             return self.print_statement();
         }
 
+        // while left brace is found.
         if self.match_token(vec![TokenType::LeftBrace]) {
             return Some(Stmt::Block(Box::new(StmtBlock {
                 block_statements: self.block(),
             })));
         }
 
+        // while if indentifier is found.
         if self.match_token(vec![TokenType::If]) {
             return self.if_statement();
         }
 
+        // while while indentifier is found.
+        if self.match_token(vec![TokenType::While]) {
+            return self.while_statement();
+        }
+
         self.expression_statement()
+    }
+
+    /// parses while type of statement.
+    pub fn while_statement(&mut self) -> Option<Stmt> {
+        self.consume(
+            TokenType::LeftParen,
+            "Expected '(' after 'while'".to_string(),
+        );
+
+        let condition = match self.expression() {
+            Some(condition) => condition,
+            None => return None,
+        };
+
+        self.consume(
+            TokenType::RightParen,
+            "Expected ')' after condition".to_string(),
+        );
+
+        let body = match self.statement() {
+            Some(body) => body,
+            None => return None,
+        };
+
+        Some(Stmt::While(Box::new(StmtWhile { condition, body })))
     }
 
     /// parses if type of statement
