@@ -1,0 +1,19 @@
+print "Count to 10";
+
+let a = 0;
+while (a < 10) {
+    print a;
+    a = a + 1;
+}
+
+print "Count even till 10";
+
+
+let b = 0;
+while (b < 10) {
+    if (b % 2 == 0) {
+        print b;
+    }
+ 
+    b = b + 1;
+}
