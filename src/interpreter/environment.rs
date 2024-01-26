@@ -37,15 +37,17 @@ impl Environment {
     /// * `name` - String name of the variable.
     /// * `value` - Assignment value.
     pub fn assign(&mut self, name: Token, value: TokenLiterals) -> Option<TokenLiterals> {
-        spdlog::debug!("Assigning value of '{name}' to '{value}'");
+        spdlog::debug!("trying to assign '{name}' to '{value}'");
 
         // assign value if the value exists in this environment.
         if self.values.contains_key(&name.lexeme) {
+            spdlog::trace!("assigning value '{name}' to '{value}'");
             return self.values.insert(name.lexeme.to_string(), value);
         }
 
         // recursively find in enclosing environments.
         if let Some(enclosing) = &mut self.enclosing {
+            spdlog::trace!("trying to assign in enclosing environment");
             return enclosing.assign(name, value);
         }
 
@@ -64,11 +66,13 @@ impl Environment {
         spdlog::debug!("finding variable with name : {name}");
         // searching the indentifier in the environment itself.
         if let Some(value) = self.values.get(&name.lexeme) {
+            spdlog::trace!("found variable {name} value : '{value}'");
             return value.to_owned();
         }
 
         // searching the indentifier in enclosing environment.
         if let Some(enclosing) = &self.enclosing {
+            spdlog::trace!("trying to find '{name}' in enclosing environment");
             return enclosing.get(name);
         }
 
