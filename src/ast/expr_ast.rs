@@ -7,6 +7,7 @@ pub enum Expr {
     Binary(Box<ExprBinary>),
     Grouping(Box<ExprGrouping>),
     Literal(Box<ExprLiteral>),
+    Logical(Box<ExprLogical>),
     Unary(Box<ExprUnary>),
     Variable(Box<ExprVariable>),
     Assignment(Box<ExprAssign>),
@@ -22,6 +23,7 @@ impl std::fmt::Display for Expr {
             Expr::Unary(n) => write!(f, "{}", n),
             Expr::Variable(n) => write!(f, "{}", n.name),
             Expr::Assignment(n) => write!(f, "{} : {}", n.name, n.value),
+            Expr::Logical(n) => write!(f, "{} {} {}", n.left, n.operator, n.right),
         }
     }
 }
@@ -38,6 +40,7 @@ pub trait ExprVisitor<T> {
     fn visit_unary_expr(&mut self, expr: &ExprUnary) -> T;
     fn visit_let_expr(&mut self, expr: &ExprVariable) -> T;
     fn visit_assign_expr(&mut self, expr: &ExprAssign) -> T;
+    fn visit_logical_expr(&mut self, expr: &ExprLogical) -> T;
 }
 
 /// Walker, in other implementation this will be called `accept`.
@@ -52,6 +55,7 @@ pub fn walk_expr<T>(visitor: &mut dyn ExprVisitor<T>, expr: &Expr) -> T {
         Expr::Unary(e) => visitor.visit_unary_expr(e),
         Expr::Variable(e) => visitor.visit_let_expr(e),
         Expr::Assignment(e) => visitor.visit_assign_expr(e),
+        Expr::Logical(e) => visitor.visit_logical_expr(e),
     }
 }
 
@@ -138,4 +142,15 @@ pub struct ExprAssign {
     pub name: Token,
     // value of assignment
     pub value: Expr,
+}
+
+/// Grammer for logical expressions.
+#[derive(Debug)]
+pub struct ExprLogical {
+    // left hand of operation.
+    pub left: Expr,
+    // operator.
+    pub operator: Token,
+    // right hand of operation.
+    pub right: Expr,
 }

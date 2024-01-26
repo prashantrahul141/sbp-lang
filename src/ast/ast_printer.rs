@@ -17,10 +17,7 @@ impl AstPrinter {
 // implementing visitor for AstPrinter.
 impl ExprVisitor<()> for AstPrinter {
     fn visit_binary_expr(&mut self, expr: &super::expr_ast::ExprBinary) {
-        print!("( {} ", expr.operator.lexeme);
-        walk_expr(self, &expr.left);
-        walk_expr(self, &expr.right);
-        print!(" )");
+        print!("{} {} {}", expr.operator.lexeme, expr.left, expr.right);
     }
 
     fn visit_grouping_expr(&mut self, expr: &super::expr_ast::ExprGrouping) {
@@ -45,5 +42,9 @@ impl ExprVisitor<()> for AstPrinter {
 
     fn visit_assign_expr(&mut self, expr: &super::expr_ast::ExprAssign) {
         print!("= {} {}", expr.name, expr.value);
+    }
+
+    fn visit_logical_expr(&mut self, expr: &super::expr_ast::ExprLogical) {
+        print!("{} {} {}", expr.operator.lexeme, expr.left, expr.right);
     }
 }
