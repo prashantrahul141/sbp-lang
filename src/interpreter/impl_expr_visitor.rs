@@ -1,7 +1,10 @@
 use super::interpreter_main::Interpreter;
 use crate::{
     app::app_main::App,
-    ast::expr_ast::{walk_expr, ExprVisitor},
+    ast::{
+        self,
+        expr_ast::{walk_expr, ExprVisitor},
+    },
     token::{token_main::TokenLiterals, token_types::TokenType},
 };
 
@@ -10,7 +13,7 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
     /// Evalute assignment expressions.
     /// # Arguments
     /// * `expr` - Binary Expression.
-    fn visit_assign_expr(&mut self, expr: &crate::ast::expr_ast::ExprAssign) -> TokenLiterals {
+    fn visit_assign_expr(&mut self, expr: &ast::expr_ast::ExprAssign) -> TokenLiterals {
         let value = walk_expr(self, &expr.value);
         self.environment
             .assign(expr.name.to_owned(), value.to_owned());
@@ -20,7 +23,7 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
     /// Evalute binary expressions.
     /// # Arguments
     /// * `expr` - Binary Expression.
-    fn visit_binary_expr(&mut self, expr: &crate::ast::expr_ast::ExprBinary) -> TokenLiterals {
+    fn visit_binary_expr(&mut self, expr: &ast::expr_ast::ExprBinary) -> TokenLiterals {
         let left = walk_expr(self, &expr.left);
         let operator = &expr.operator;
         let right = walk_expr(self, &expr.right);
@@ -144,7 +147,7 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
     /// Evalute group expressions.
     /// # Arguments
     /// * `expr` - Grouping Expression.
-    fn visit_grouping_expr(&mut self, expr: &crate::ast::expr_ast::ExprGrouping) -> TokenLiterals {
+    fn visit_grouping_expr(&mut self, expr: &ast::expr_ast::ExprGrouping) -> TokenLiterals {
         spdlog::trace!("interpreting grouping expression: {:?}", expr);
         walk_expr(self, &expr.expression)
     }
@@ -152,7 +155,7 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
     /// Evalute literal expressions.
     /// # Arguments
     /// * `expr` - literal Expression.
-    fn visit_literal_expr(&mut self, expr: &crate::ast::expr_ast::ExprLiteral) -> TokenLiterals {
+    fn visit_literal_expr(&mut self, expr: &ast::expr_ast::ExprLiteral) -> TokenLiterals {
         spdlog::trace!("interpreting literal expression: {:?}", expr);
         expr.value.to_owned()
     }
@@ -160,7 +163,7 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
     /// Evalute unary expressions.
     /// # Arguments
     /// * `expr` - Unary expression.
-    fn visit_unary_expr(&mut self, expr: &crate::ast::expr_ast::ExprUnary) -> TokenLiterals {
+    fn visit_unary_expr(&mut self, expr: &ast::expr_ast::ExprUnary) -> TokenLiterals {
         spdlog::trace!("interpreting unary expression: {:?}", expr);
         let right = walk_expr(self, &expr.right);
 
@@ -176,9 +179,35 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
 
     /// Evalute let expressions.
     /// # Arguments
-    /// * `expr` - Unary expression.
-    fn visit_let_expr(&mut self, expr: &crate::ast::expr_ast::ExprVariable) -> TokenLiterals {
+    /// * `expr` - Variable expression.
+    fn visit_let_expr(&mut self, expr: &ast::expr_ast::ExprVariable) -> TokenLiterals {
         spdlog::trace!("interpreting variable expression: {:?}", expr);
         self.environment.get(expr.name.to_owned())
+    }
+
+    /// Evalute logical expressions.
+    /// # Arguments
+    /// * `expr` - Logical expression.
+    fn visit_logical_expr(&mut self, expr: &ast::expr_ast::ExprLogical) -> TokenLiterals {
+        let left = walk_expr(self, &expr.left);
+
+        if let TokenType::Or = expr.operator.token_type {
+            // in case of "OR", we check if left operand is true,
+            // if is is true, then we dont need to check the right operand as well
+            // we can safely assume that the entire expression will be true.
+            if self.is_truth(left.clone()) {
+                return left;
+            }
+        } else {
+            // in case of "AND", we check if left operand is false,
+            // if is is false, then we dont need to check the right operand as well
+            // we can safely assume that the entire expression will be false.
+            if !self.is_truth(left.clone()) {
+                return left;
+            }
+        }
+
+        // if we miss above cases, we also solve the right operand and return that.
+        walk_expr(self, &expr.right)
     }
 }
