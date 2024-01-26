@@ -4,7 +4,8 @@ use crate::{
     app::app_main::App,
     ast::{
         expr_ast::{
-            Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprUnary, ExprVariable,
+            Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary,
+            ExprVariable,
         },
         stmt_ast::{Stmt, StmtBlock, StmtExpr, StmtIf, StmtLet, StmtPrint},
     },
@@ -197,7 +198,7 @@ impl Parser {
     /// Parsing method for assignment expressions
     pub fn assignment(&mut self) -> Option<Expr> {
         spdlog::trace!("parsing assignment");
-        let expr = match self.equality() {
+        let expr = match self.or() {
             Some(expr) => expr,
             None => return None,
         };
@@ -221,6 +222,44 @@ impl Parser {
 
         // return the expr itself if didnt found a '='
         Some(expr)
+    }
+
+    // Parsing logical or
+    pub fn or(&mut self) -> Option<Expr> {
+        if let Some(left) = self.and() {
+            // recursively loop as long as we recieve OR type tokens.
+            while self.match_token(vec![TokenType::Or]) {
+                let operator = self.previous().clone();
+                if let Some(right) = self.and() {
+                    return Some(Expr::Logical(Box::new(ExprLogical {
+                        left,
+                        operator,
+                        right,
+                    })));
+                }
+            }
+            return Some(left);
+        }
+        None
+    }
+
+    // parsing logical and
+    pub fn and(&mut self) -> Option<Expr> {
+        if let Some(left) = self.equality() {
+            // recursively loop as long as we recieve AND type tokens.
+            while self.match_token(vec![TokenType::And]) {
+                let operator = self.previous().clone();
+                if let Some(right) = self.equality() {
+                    return Some(Expr::Logical(Box::new(ExprLogical {
+                        left,
+                        operator,
+                        right,
+                    })));
+                }
+            }
+            return Some(left);
+        }
+        None
     }
 
     /// Parsing method for equality type expressions.
