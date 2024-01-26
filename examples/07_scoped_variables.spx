@@ -17,3 +17,11 @@ let c = "global c";
 print a;
 print b;
 print c;
+
+let z = 2;
+{
+  let z = z + 2; 
+  print z; // 4
+}
+
+print z; // 2

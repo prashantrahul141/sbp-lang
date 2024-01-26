@@ -30,17 +30,18 @@ impl Parser {
         spdlog::debug!("Starting parsing.");
 
         while !self.is_at_end() {
-            match self.declaration() {
-                Some(statement) => statements.push(statement),
-                None => {
-                    App::error(
-                        self.tokens[self.current].line,
-                        "Failed to parse statement".to_string(),
-                    );
-                    self.synchronize();
-                }
+            if let Some(statement) = self.declaration() {
+                statements.push(statement);
+                continue;
             }
+
+            App::error(
+                self.tokens[self.current].line,
+                "Failed to parse statement".to_string(),
+            );
+            self.synchronize();
         }
+
         statements
     }
 
@@ -128,10 +129,6 @@ impl Parser {
             }
         }
 
-        self.consume(
-            TokenType::RightBrace,
-            "Expected '}' at the end of a block".to_string(),
-        );
         block_statements
     }
 
