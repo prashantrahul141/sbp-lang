@@ -7,6 +7,16 @@ use crate::{
 
 /// Impl Visitor pattern for Interpreter.
 impl ExprVisitor<TokenLiterals> for Interpreter {
+    /// Evalute assignment expressions.
+    /// # Arguments
+    /// * `expr` - Binary Expression.
+    fn visit_assign_expr(&mut self, expr: &crate::ast::expr_ast::ExprAssign) -> TokenLiterals {
+        let value = walk_expr(self, &expr.value);
+        self.environment
+            .assign(expr.name.to_owned(), value.to_owned());
+        value
+    }
+
     /// Evalute binary expressions.
     /// # Arguments
     /// * `expr` - Binary Expression.
