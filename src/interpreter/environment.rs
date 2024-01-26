@@ -27,6 +27,25 @@ impl Environment {
         self.values.insert(name, value);
     }
 
+    /// Assigns value to an already existing entry in the environment
+    /// and return its value.
+    /// Otherwise results panic error if the binding does not exist.
+    /// # Arguments
+    /// * `name` - String name of the variable.
+    /// * `value` - Assignment value.
+    pub fn assign(&mut self, name: Token, value: TokenLiterals) -> Option<TokenLiterals> {
+        spdlog::debug!("Assigning value of '{name}' to '{value}'");
+        if self.values.contains_key(&name.lexeme) {
+            return self.values.insert(name.lexeme.to_string(), value);
+        }
+
+        App::runtime_error(
+            name.line,
+            format!("Reference to undefined variable '{}'", name.lexeme),
+        );
+        panic!();
+    }
+
     /// Retrieves variable values from the environment, throws runtime error if not found.
     /// # Arguments
     /// * `name` - The token whose's lexeme value will be searched for.
