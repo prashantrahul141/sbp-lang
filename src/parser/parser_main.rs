@@ -4,7 +4,7 @@ use crate::{
         expr_ast::{
             Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprUnary, ExprVariable,
         },
-        stmt_ast::{Stmt, StmtExpr, StmtLet, StmtPrint},
+        stmt_ast::{Stmt, StmtBlock, StmtExpr, StmtLet, StmtPrint},
     },
     token::{
         self,
@@ -92,6 +92,12 @@ impl Parser {
             return self.print_statement();
         }
 
+        if self.match_token(vec![TokenType::LeftBrace]) {
+            return Some(Stmt::Block(Box::new(StmtBlock {
+                block_statements: self.block(),
+            })));
+        }
+
         self.expression_statement()
     }
 
@@ -108,6 +114,25 @@ impl Parser {
         }
 
         None
+    }
+
+    pub fn block(&mut self) -> Vec<Stmt> {
+        let mut block_statements = vec![];
+        while !self.match_token(vec![TokenType::RightBrace]) && !self.is_at_end() {
+            match self.declaration() {
+                Some(stmt) => block_statements.push(stmt),
+                None => self.parser_report_error(
+                    &self.tokens[self.current],
+                    "Failed parsing block statements.".to_string(),
+                ),
+            }
+        }
+
+        self.consume(
+            TokenType::RightBrace,
+            "Expected '}' at the end of a block".to_string(),
+        );
+        block_statements
     }
 
     // parses expression type of statement.
