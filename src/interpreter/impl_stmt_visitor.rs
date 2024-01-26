@@ -1,8 +1,15 @@
-use super::interpreter_main::Interpreter;
+use super::{environment::Environment, interpreter_main::Interpreter};
 use crate::ast::{expr_ast::walk_expr, stmt_ast::StmtVisitor};
 
 /// Impl StmtVisitor pattern for Interpreter.
 impl StmtVisitor for Interpreter {
+    fn visit_block_stmt(&mut self, stmt: &crate::ast::stmt_ast::StmtBlock) {
+        self.execute_block(
+            stmt,
+            Environment::new(Some(Box::new(self.environment.clone()))),
+        );
+    }
+
     /// struct method walks/executes expression statements.
     /// # Arguments
     /// * `stmt` - stmtexpr stmt to walk.

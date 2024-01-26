@@ -1,6 +1,6 @@
 use super::{environment::Environment, interpreter_main::Interpreter};
 use crate::{
-    ast::stmt_ast::{walk_stmt, Stmt},
+    ast::stmt_ast::{walk_stmt, Stmt, StmtBlock},
     token::token_main::TokenLiterals,
 };
 
@@ -9,7 +9,7 @@ impl Interpreter {
     pub fn new() -> Self {
         spdlog::debug!("constructing new interpreter.");
         Self {
-            environment: Environment::new(),
+            environment: Environment::new(None),
         }
     }
 
@@ -19,12 +19,34 @@ impl Interpreter {
     pub fn interpret(&mut self, statements: Vec<Stmt>) {
         spdlog::info!("start interpreting");
         for statement in statements {
-            self.execute(statement);
+            self.execute(&statement);
         }
     }
 
+    /// Executes a block of statements, give it a new environment.
+    /// # Arguments
+    /// * `enclosing` - The enclosing environment.
+    pub fn execute_block(
+        &mut self,
+        block_statements: &StmtBlock,
+        enclosing_environment: Environment,
+    ) {
+        // setting current env as enclosing's environment.
+        let previous_environment = self.environment.clone();
+
+        self.environment = enclosing_environment;
+
+        // executing block statements.
+        for stmt in &block_statements.block_statements {
+            self.execute(stmt)
+        }
+
+        // reverting back to
+        self.environment = previous_environment;
+    }
+
     /// Walks one statement at a time.
-    pub fn execute(&mut self, statement: Stmt) {
+    pub fn execute(&mut self, statement: &Stmt) {
         spdlog::debug!("executing stmt : {:?}", statement);
         walk_stmt(self, &statement);
     }
