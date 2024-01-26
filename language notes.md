@@ -13,7 +13,7 @@ binary      ->   expression operator expression ;
 operator    ->   "==" | "!=" | "<" | "<=" | ">" | ">=" | "+"  | "-"  | "*" | "/" ;
 ```
 
-### Recursive decent parser grammer
+### Recursive descent parser grammer
 ```
 program       ->     declaration* EOF ;
 
@@ -25,7 +25,9 @@ varDecl       ->     "let" IDENTIFIER ( "=" expression )? ";" ;
 statement     ->     exprStmt
                    | printStmt ;
 
-expression    ->     equality ;
+expression    ->     assignment;
+
+assignment    ->     INDENTIFIER "=" assignment | equality ;
 
 equality      ->     comparison ( ( "!=" | "==" ) comparison )* ;
 
