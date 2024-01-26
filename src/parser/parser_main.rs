@@ -1,9 +1,9 @@
-use std::vec;
-
 use crate::{
     app::app_main::App,
     ast::{
-        expr_ast::{Expr, ExprBinary, ExprGrouping, ExprLiteral, ExprUnary, ExprVariable},
+        expr_ast::{
+            Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprUnary, ExprVariable,
+        },
         stmt_ast::{Stmt, StmtExpr, StmtLet, StmtPrint},
     },
     token::{
@@ -130,7 +130,36 @@ impl Parser {
     /// Nonterminal type.
     pub fn expression(&mut self) -> Option<Expr> {
         spdlog::trace!("parsing expression");
-        self.equality()
+        self.assignment()
+    }
+
+    /// Parsing method for assignment expressions
+    pub fn assignment(&mut self) -> Option<Expr> {
+        spdlog::trace!("parsing assignment");
+        let expr = match self.equality() {
+            Some(expr) => expr,
+            None => return None,
+        };
+
+        // if we find a '='.
+        if self.match_token(vec![TokenType::Equal]) {
+            if let Some(value) = self.assignment() {
+                if let Expr::Variable(expr) = expr {
+                    // create assignment expression if left token was variable,
+                    // with a equal,
+                    // with a valid expression/assignment on right.
+                    let name = expr.name;
+                    return Some(Expr::Assignment(Box::new(ExprAssign { name, value })));
+                }
+            }
+
+            // we error if found weird assignment expression.
+            App::runtime_error(self.previous().line, "Invalid assignment.".to_string());
+            panic!();
+        }
+
+        // return the expr itself if didnt found a '='
+        Some(expr)
     }
 
     /// Parsing method for equality type expressions.

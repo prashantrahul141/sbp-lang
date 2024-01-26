@@ -79,11 +79,6 @@ impl Parser {
     /// # Arguments
     /// * `token` - The TokenType to compare.
     pub fn check(&self, token_type: &TokenType) -> bool {
-        spdlog::trace!(
-            "checking if current token : {} is of type : {}",
-            self.peek(),
-            token_type
-        );
         if self.is_at_end() {
             return false;
         }
@@ -97,9 +92,7 @@ impl Parser {
 
     /// Check and returns if the next token is of EOF.
     pub fn is_at_end(&self) -> bool {
-        let reached_end = self.peek().token_type == TokenType::Eof;
-        spdlog::trace!("checking if reached the end : {}", reached_end);
-        reached_end
+        self.peek().token_type == TokenType::Eof
     }
 
     /// Splax's core way of handling faulty statements.
