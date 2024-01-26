@@ -5,6 +5,7 @@ use super::expr_ast::Expr;
 /// Top level statements enum.
 #[derive(Debug)]
 pub enum Stmt {
+    Block(Box<StmtBlock>),
     Expr(Box<StmtExpr>),
     Print(Box<StmtPrint>),
     Let(Box<StmtLet>),
@@ -16,6 +17,7 @@ pub enum Stmt {
 /// When any new pass/feature we need to implement to the statements,
 /// we just impl this visitor trait to that struct.
 pub trait StmtVisitor {
+    fn visit_block_stmt(&mut self, stmt: &StmtBlock);
     fn visit_expression_stmt(&mut self, stmt: &StmtExpr);
     fn visit_print_stmt(&mut self, stmt: &StmtPrint);
     fn visit_let_stmt(&mut self, stmt: &StmtLet);
@@ -27,10 +29,18 @@ pub trait StmtVisitor {
 /// * `stmt` - The stmt to walk.
 pub fn walk_stmt(visitor: &mut dyn StmtVisitor, stmt: &Stmt) {
     match stmt {
+        Stmt::Block(stmt) => visitor.visit_block_stmt(stmt),
         Stmt::Expr(stmt) => visitor.visit_expression_stmt(stmt),
         Stmt::Print(stmt) => visitor.visit_print_stmt(stmt),
         Stmt::Let(stmt) => visitor.visit_let_stmt(stmt),
     }
+}
+
+/// Grammer for stmtblock statemments.
+#[derive(Debug)]
+pub struct StmtBlock {
+    // the expression itself.
+    pub block_statements: Vec<Stmt>,
 }
 
 /// Grammer for stmtexpr statemments.
