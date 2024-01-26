@@ -9,6 +9,7 @@ pub enum Expr {
     Literal(Box<ExprLiteral>),
     Unary(Box<ExprUnary>),
     Variable(Box<ExprVariable>),
+    Assignment(Box<ExprAssign>),
 }
 
 /// display implementation for token expr.
@@ -20,6 +21,7 @@ impl std::fmt::Display for Expr {
             Expr::Literal(n) => write!(f, "{}", n),
             Expr::Unary(n) => write!(f, "{}", n),
             Expr::Variable(n) => write!(f, "{}", n.name),
+            Expr::Assignment(n) => write!(f, "{} : {}", n.name, n.value),
         }
     }
 }
@@ -35,6 +37,7 @@ pub trait ExprVisitor<T> {
     fn visit_literal_expr(&mut self, expr: &ExprLiteral) -> T;
     fn visit_unary_expr(&mut self, expr: &ExprUnary) -> T;
     fn visit_let_expr(&mut self, expr: &ExprVariable) -> T;
+    fn visit_assign_expr(&mut self, expr: &ExprAssign) -> T;
 }
 
 /// Walker, in other implementation this will be called `accept`.
@@ -48,6 +51,7 @@ pub fn walk_expr<T>(visitor: &mut dyn ExprVisitor<T>, expr: &Expr) -> T {
         Expr::Literal(e) => visitor.visit_literal_expr(e),
         Expr::Unary(e) => visitor.visit_unary_expr(e),
         Expr::Variable(e) => visitor.visit_let_expr(e),
+        Expr::Assignment(e) => visitor.visit_assign_expr(e),
     }
 }
 
@@ -125,4 +129,13 @@ impl std::fmt::Display for ExprVariable {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.name)
     }
+}
+
+/// Grammer for assignment expressions.
+#[derive(Debug)]
+pub struct ExprAssign {
+    // name of the variable
+    pub name: Token,
+    // value of assignment
+    pub value: Expr,
 }

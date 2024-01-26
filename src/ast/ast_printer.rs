@@ -40,6 +40,10 @@ impl ExprVisitor<()> for AstPrinter {
     }
 
     fn visit_let_expr(&mut self, expr: &super::expr_ast::ExprVariable) {
-        print!(" {} ", expr.name);
+        print!("let {}", expr.name);
+    }
+
+    fn visit_assign_expr(&mut self, expr: &super::expr_ast::ExprAssign) {
+        print!("= {} {}", expr.name, expr.value);
     }
 }
