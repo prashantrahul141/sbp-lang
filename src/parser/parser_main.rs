@@ -106,6 +106,12 @@ impl Parser {
             })));
         }
 
+        // for loops
+
+        if self.match_token(vec![TokenType::For]) {
+            return self.for_statement();
+        }
+
         // while if indentifier is found.
         if self.match_token(vec![TokenType::If]) {
             return self.if_statement();
@@ -117,6 +123,89 @@ impl Parser {
         }
 
         self.expression_statement()
+    }
+
+    /// desugars for loop
+    pub fn for_statement(&mut self) -> Option<Stmt> {
+        spdlog::debug!("desugaring a for loop stmt.");
+
+        // starting left paren
+        self.consume(
+            TokenType::LeftParen,
+            "Expected '(' after 'for' ".to_string(),
+        );
+
+        // parsing initialiser
+        let initialiser: Option<Stmt>;
+        if self.match_token(vec![TokenType::Semicolon]) {
+            initialiser = None;
+        } else if self.match_token(vec![TokenType::Let]) {
+            initialiser = self.let_declaration();
+        } else {
+            initialiser = self.expression_statement();
+        }
+
+        // parsing loop condition.
+        let mut condition: Option<Expr> = None;
+        if !self.check(&TokenType::Semicolon) {
+            condition = self.expression();
+        }
+
+        self.consume(
+            TokenType::Semicolon,
+            "Expected ';' after loop condition".to_string(),
+        );
+
+        // parsing loop incrementer.
+        let mut increment: Option<Expr> = None;
+        if !self.check(&TokenType::RightParen) {
+            increment = self.expression();
+        }
+
+        self.consume(
+            TokenType::RightParen,
+            "Expected ')' after loop increment".to_string(),
+        );
+
+        // creating new body
+        if let Some(mut body) = self.statement() {
+            // if there is a increment.
+
+            if let Some(increment) = increment {
+                body = Stmt::Block(Box::new(StmtBlock {
+                    block_statements: vec![
+                        body,
+                        Stmt::Expr(Box::new(StmtExpr { expr: increment })),
+                    ],
+                }));
+            }
+
+            // if there are no condition, we default to true.
+            if let None = condition {
+                condition = Some(Expr::Literal(Box::new(ExprLiteral {
+                    value: TokenLiterals::Boolean(true),
+                })));
+            }
+
+            // create while loop with the above condition and parsed body.
+            body = Stmt::While(Box::new(StmtWhile {
+                // we already checked if condition was None, so its safe to assume
+                // its going to be non None here.
+                condition: condition?,
+                body,
+            }));
+
+            // if there is a initialiser, we add it before the while loop.
+            if let Some(initialiser) = initialiser {
+                body = Stmt::Block(Box::new(StmtBlock {
+                    block_statements: vec![initialiser, body],
+                }));
+            }
+
+            return Some(body);
+        }
+
+        None
     }
 
     /// parses while type of statement.
