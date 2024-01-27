@@ -1,0 +1,11 @@
+print "0 - 9 using for loop";
+for (let i = 0; i < 10; i = i + 1)  {
+    print i;
+}
+
+print "even numbers b/w 0 - 9 using for loop";
+for (let i = 0; i < 10; i = i + 1)  {
+    if (i % 2 == 0) {
+        print i;
+    }
+}

@@ -17,16 +17,19 @@ operator    ->   "==" | "!=" | "<" | "<=" | ">" | ">=" | "+"  | "-"  | "*" | "/"
 ```
 program       ->     declaration* EOF ;
 
-declaration   ->     varDecl
+declaration   ->     letDecl
                     | statement ;
 
-varDecl       ->     "let" IDENTIFIER ( "=" expression )? ";" ;
+letDecl       ->     "let" IDENTIFIER ( "=" expression )? ";" ;
 
 statement     ->     exprStmt
+                   | forStmt
                    | ifStmt
                    | printStmt
                    | whileStmt
                    | block ;
+
+forStmt       ->     "for" "(" (letDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
 
 whileStmt     ->     "while" "(" expression ")" statement ;
 
