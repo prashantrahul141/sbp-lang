@@ -4,8 +4,8 @@ use crate::{
     app::app_main::App,
     ast::{
         expr_ast::{
-            Expr, ExprAssign, ExprBinary, ExprGrouping, ExprLiteral, ExprLogical, ExprUnary,
-            ExprVariable,
+            Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical,
+            ExprUnary, ExprVariable,
         },
         stmt_ast::{Stmt, StmtBlock, StmtExpr, StmtIf, StmtLet, StmtPrint, StmtWhile},
     },
@@ -495,8 +495,67 @@ impl Parser {
             }
         }
 
-        // or return the primary of the unary expression.
-        self.primary()
+        // the expression might be a call.
+        self.call()
+    }
+
+    // Parsing function call.
+    pub fn call(&mut self) -> Option<Expr> {
+        let mut expr = self.primary();
+        loop {
+            if self.match_token(vec![TokenType::LeftParen]) {
+                expr = self.finish_call(expr);
+            } else {
+                break;
+            }
+        }
+
+        expr
+    }
+    // parsing tailing function calls.
+    pub fn finish_call(&mut self, callee: Option<Expr>) -> Option<Expr> {
+        if let Some(callee) = callee {
+            let mut arguments = vec![];
+
+            // if we find right paren.
+            if !self.check(&TokenType::RightParen) {
+                // rust way of doing do-while loop.
+                // add arguments.
+                if let Some(argument) = self.expression() {
+                    arguments.push(argument);
+                }
+                loop {
+                    if arguments.len() >= 255 {
+                        let error_token = &self.tokens[self.current].to_owned();
+                        self.parser_report_error(
+                            error_token,
+                            "Can't have more than 255 function arguments.".to_string(),
+                        )
+                    }
+                    // add arguments.
+                    if let Some(argument) = self.expression() {
+                        arguments.push(argument);
+                    }
+                    // if we see a comma we have reached the end of this argument.
+                    if self.match_token(vec![TokenType::Comma]) {
+                        break;
+                    }
+                }
+            }
+
+            if let Some(paren) = self.consume(
+                TokenType::RightParen,
+                "Expected ')' after function arguments.".to_string(),
+            ) {
+                return Some(Expr::Call(Box::new(ExprCall {
+                    callee,
+                    paren: paren.to_owned(),
+                    arguments,
+                })));
+            }
+        }
+
+        None
     }
 
     /// Parsing method for primary type expressions.
