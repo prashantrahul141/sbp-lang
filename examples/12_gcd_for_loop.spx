@@ -1,0 +1,12 @@
+let n1 = 20;
+let n2 = 242;
+let gcd = 0;
+
+for(let i = 1; i <= n1 and i <= n2; i = i + 1)
+{
+    if(n1 % i == 0 and n2 % i == 0) {
+        gcd = i;
+    }
+}
+
+print gcd;
