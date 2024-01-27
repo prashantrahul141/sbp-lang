@@ -18,8 +18,8 @@ pub enum Commands {
 
     // file path to compile
     #[command()]
-    #[command(about = "Compile a file")]
-    Compile {
+    #[command(about = "Run from a file")]
+    Run {
         #[arg(required = true)]
         filepath: PathBuf,
     },

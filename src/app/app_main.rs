@@ -33,7 +33,7 @@ impl App {
             }
 
             // compile.
-            cli::Commands::Compile { filepath } => {
+            cli::Commands::Run { filepath } => {
                 spdlog::debug!("compile command was invoked");
                 self.compile_file(&filepath);
             }
