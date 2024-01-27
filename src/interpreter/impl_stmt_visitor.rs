@@ -7,7 +7,7 @@ impl StmtVisitor for Interpreter {
     fn visit_block_stmt(&mut self, stmt: &ast::stmt_ast::StmtBlock) {
         self.execute_block(
             stmt,
-            Environment::new(Some(Box::new(self.environment.clone()))),
+            Box::new(Environment::new(Some(self.environment.clone()))),
         );
     }
 

@@ -1,5 +1,6 @@
 use super::{environment::Environment, interpreter_main::Interpreter};
 use crate::{
+    app::app_main::App,
     ast::stmt_ast::{walk_stmt, Stmt, StmtBlock},
     token::token_main::TokenLiterals,
 };
@@ -9,7 +10,7 @@ impl Interpreter {
     pub fn new() -> Self {
         spdlog::debug!("constructing new interpreter.");
         Self {
-            environment: Environment::new(None),
+            environment: Box::new(Environment::new(None)),
         }
     }
 
@@ -29,20 +30,25 @@ impl Interpreter {
     pub fn execute_block(
         &mut self,
         block_statements: &StmtBlock,
-        enclosing_environment: Environment,
+        child_environment: Box<Environment>,
     ) {
-        // setting current env as enclosing's environment.
-        let previous_environment = self.environment.clone();
-
-        self.environment = enclosing_environment;
+        // setting current env as child environment.
+        self.environment = child_environment;
 
         // executing block statements.
         for stmt in &block_statements.block_statements {
             self.execute(stmt)
         }
 
-        // reverting back to
-        self.environment = previous_environment;
+        // take current's parent environment, clone it and make it current environment
+        if let Some(parent_environment) = self.environment.enclosing.clone() {
+            self.environment = parent_environment;
+            return;
+        }
+
+        // this is unreachable, if you somehow manage to trigger it,
+        // feel free to fix it and make a pr.
+        App::runtime_error(0, "Reassignment of environment failed.".to_string());
     }
 
     /// Walks one statement at a time.
