@@ -20,7 +20,8 @@ impl App {
         let mut parser = Parser::new(tokens);
         let statements = parser.parse();
 
-        if self.has_error {
+        if parser.has_error {
+            spdlog::error!("found parsing errrors, terminating execution.");
             return;
         }
 

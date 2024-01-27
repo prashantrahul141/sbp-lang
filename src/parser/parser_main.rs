@@ -22,6 +22,8 @@ pub struct Parser {
     pub tokens: Vec<Token>,
     // current progress of parsing.
     pub current: usize,
+    // stores if there were any parsing error.
+    pub has_error: bool,
 }
 
 impl Parser {
@@ -195,10 +197,13 @@ impl Parser {
         while !self.match_token(vec![TokenType::RightBrace]) && !self.is_at_end() {
             match self.declaration() {
                 Some(stmt) => block_statements.push(stmt),
-                None => self.parser_report_error(
-                    &self.tokens[self.current],
-                    "Failed parsing block statements.".to_string(),
-                ),
+                None => {
+                    let current = self.tokens[self.current].clone();
+                    self.parser_report_error(
+                        &current,
+                        "Failed parsing block statements.".to_string(),
+                    );
+                }
             }
         }
 
@@ -472,7 +477,8 @@ impl Parser {
             }
         }
 
-        self.parser_report_error(self.peek(), "Expected expression.".to_string());
+        let peek = self.peek().clone();
+        self.parser_report_error(&peek, "Expected expression.".to_string());
 
         None
     }

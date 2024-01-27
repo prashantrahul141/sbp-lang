@@ -10,7 +10,11 @@ impl Parser {
     /// * `tokens` : Vector of tokens to parse.
     pub fn new(tokens: Vec<Token>) -> Self {
         spdlog::debug!("creating new parser");
-        Self { tokens, current: 0 }
+        Self {
+            tokens,
+            current: 0,
+            has_error: false,
+        }
     }
 
     /// checks and consumes current token, else gives the provided error message.
@@ -24,7 +28,8 @@ impl Parser {
             return Some(self.advance());
         }
 
-        self.parser_report_error(self.peek(), message);
+        let peek = self.peek().clone();
+        self.parser_report_error(&peek, message);
         None
     }
 
@@ -32,7 +37,8 @@ impl Parser {
     /// # Arguments
     /// * `token` - Reference to token which caused error.
     /// * `message` - The error message to show.
-    pub fn parser_report_error(&self, token: &Token, message: String) {
+    pub fn parser_report_error(&mut self, token: &Token, message: String) {
+        self.has_error = true;
         App::error_token(token.clone(), message);
     }
 
