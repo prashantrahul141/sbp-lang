@@ -5,6 +5,7 @@ use crate::token::token_main::{Token, TokenLiterals};
 #[derive(Debug)]
 pub enum Expr {
     Binary(Box<ExprBinary>),
+    Call(Box<ExprCall>),
     Grouping(Box<ExprGrouping>),
     Literal(Box<ExprLiteral>),
     Logical(Box<ExprLogical>),
@@ -18,6 +19,7 @@ impl std::fmt::Display for Expr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Expr::Binary(n) => write!(f, "{}", n),
+            Expr::Call(n) => write!(f, "{}({:?})", n.callee, n.arguments),
             Expr::Grouping(n) => write!(f, "{}", n),
             Expr::Literal(n) => write!(f, "{}", n),
             Expr::Unary(n) => write!(f, "{}", n),
@@ -35,6 +37,7 @@ impl std::fmt::Display for Expr {
 /// we just impl this visitor trait to that struct.
 pub trait ExprVisitor<T> {
     fn visit_binary_expr(&mut self, expr: &ExprBinary) -> T;
+    fn visit_call_expr(&mut self, expr: &ExprCall) -> T;
     fn visit_grouping_expr(&mut self, expr: &ExprGrouping) -> T;
     fn visit_literal_expr(&mut self, expr: &ExprLiteral) -> T;
     fn visit_unary_expr(&mut self, expr: &ExprUnary) -> T;
@@ -50,6 +53,7 @@ pub trait ExprVisitor<T> {
 pub fn walk_expr<T>(visitor: &mut dyn ExprVisitor<T>, expr: &Expr) -> T {
     match expr {
         Expr::Binary(e) => visitor.visit_binary_expr(e),
+        Expr::Call(e) => visitor.visit_call_expr(e),
         Expr::Grouping(e) => visitor.visit_grouping_expr(e),
         Expr::Literal(e) => visitor.visit_literal_expr(e),
         Expr::Unary(e) => visitor.visit_unary_expr(e),
@@ -153,4 +157,15 @@ pub struct ExprLogical {
     pub operator: Token,
     // right hand of operation.
     pub right: Expr,
+}
+
+/// Grammer for functions call expressions.
+#[derive(Debug)]
+pub struct ExprCall {
+    // function callee
+    pub callee: Expr,
+    // paren "(" ")" tokens.
+    pub paren: Token,
+    // right hand of operation.
+    pub arguments: Vec<Expr>,
 }
