@@ -2,6 +2,9 @@
 name = "splax"
 version = "0.1.0"
 edition = "2021"
+homepage = "https://github.com/prashantrahul141/splax"
+description = "A learning programming language."
+documentation = "https://github.com/prashantrahul141/splax#readme"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
