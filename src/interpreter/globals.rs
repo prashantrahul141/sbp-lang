@@ -9,13 +9,21 @@ impl Interpreter {
         // language version.
         globals.define(
             "__VERSION__".to_string(),
-            token::token_main::TokenLiterals::String(std::env!("CARGO_PKG_VERSION").to_string()),
+            super::environment::SplaxDeclarations::Literals(Box::new(
+                token::token_main::TokenLiterals::String(
+                    std::env!("CARGO_PKG_VERSION").to_string(),
+                ),
+            )),
         );
 
         // url to homepage.
         globals.define(
             "__HOMEPAGE__".to_string(),
-            token::token_main::TokenLiterals::String(std::env!("CARGO_PKG_HOMEPAGE").to_string()),
+            super::environment::SplaxDeclarations::Literals(Box::new(
+                token::token_main::TokenLiterals::String(
+                    std::env!("CARGO_PKG_HOMEPAGE").to_string(),
+                ),
+            )),
         );
 
         globals
