@@ -181,7 +181,7 @@ impl Parser {
             }
 
             // if there are no condition, we default to true.
-            if let None = condition {
+            if condition.is_none() {
                 condition = Some(Expr::Literal(Box::new(ExprLiteral {
                     value: TokenLiterals::Boolean(true),
                 })));
