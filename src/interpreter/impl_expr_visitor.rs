@@ -189,7 +189,7 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
         match self.environment.get(expr.name.to_owned()) {
             SplaxDeclarations::Literals(literal) => *literal,
             SplaxDeclarations::Functions(function) => {
-                TokenLiterals::String(format!("<fn {}>", function.declaration.name))
+                TokenLiterals::String(format!("<fn '{}'>", function.declaration.name.lexeme))
             }
         }
     }

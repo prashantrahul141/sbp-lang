@@ -1,4 +1,5 @@
 use crate::{
+    app::app_main::App,
     interpreter::{
         environment::{self, Environment},
         interpreter_main::Interpreter,
@@ -202,6 +203,17 @@ impl SplaxCallable for FunctionObject {
             environment.define(
                 self.declaration.params[i].lexeme.to_string(),
                 environment::SplaxDeclarations::Literals(Box::new(arg.clone())),
+            )
+        }
+
+        if arguments.len() != self.declaration.params.len() {
+            App::runtime_error(
+                self.declaration.name.line,
+                format!(
+                    "Expected {} arguments got {}.",
+                    self.declaration.params.len(),
+                    arguments.len()
+                ),
             )
         }
 

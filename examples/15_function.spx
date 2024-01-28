@@ -2,9 +2,17 @@ fn add(a, b) {
     print a + b;
 }
 
-fn subtract(a, b){
-    print a - b;
+add(1, 2);
+add("First ", "Last");
+
+fn print_only_even(n) {
+    if (n % 2 == 0) {
+        print n;
+    }
 }
 
-add(1, 2);
-subtract(1, 2);
+let i = 0;
+while (i < 11) {
+    print_only_odd(i);
+    i = i + 1;
+}
