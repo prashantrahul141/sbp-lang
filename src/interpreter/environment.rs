@@ -34,21 +34,13 @@ impl Environment {
     /// and return its value.
     /// Otherwise results panic error if the binding does not exist.
     /// # Arguments
-    /// * `name` - String name of the variable.
+    /// * `name` - Variable as Token
     /// * `value` - Assignment value.
     pub fn assign(&mut self, name: Token, value: TokenLiterals) -> Option<TokenLiterals> {
-        spdlog::debug!("trying to assign '{name}' to '{value}'");
+        // call internal assign_from_Str
 
-        // assign value if the value exists in this environment.
-        if self.values.contains_key(&name.lexeme) {
-            spdlog::trace!("assigning value '{name}' to '{value}'");
-            return self.values.insert(name.lexeme.to_string(), value);
-        }
-
-        // recursively find in enclosing environments.
-        if let Some(enclosing) = &mut self.enclosing {
-            spdlog::trace!("trying to assign in enclosing environment");
-            return enclosing.assign(name, value);
+        if let Some(value) = self.assign_from_str(&name.lexeme, value) {
+            return Some(value);
         }
 
         // throw a runtime error if we couldn't find the indentifier.
@@ -57,6 +49,34 @@ impl Environment {
             format!("Reference to undefined variable '{}'", name.lexeme),
         );
         panic!();
+    }
+
+    /// Assigns value to an already existing entry in the environment
+    /// and return its value.
+    /// Otherwise results panic error if the binding does not exist.
+    /// # Arguments
+    /// * `name` - String name of the variable.
+    /// * `value` - Assignment value.
+    pub fn assign_from_str(
+        &mut self,
+        name: &String,
+        value: TokenLiterals,
+    ) -> Option<TokenLiterals> {
+        spdlog::debug!("trying to assign '{name}' to '{value}'");
+
+        // assign value if the value exists in this environment.
+        if self.values.contains_key(name) {
+            spdlog::trace!("assigning value '{name}' to '{value}'");
+            return self.values.insert(name.to_string(), value);
+        }
+
+        // recursively find in enclosing environments.
+        if let Some(enclosing) = &mut self.enclosing {
+            spdlog::trace!("trying to assign in enclosing environment");
+            return enclosing.assign_from_str(name, value);
+        }
+
+        None
     }
 
     /// Retrieves variable values from the environment, throws runtime error if not found.
