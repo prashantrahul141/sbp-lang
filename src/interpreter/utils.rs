@@ -9,8 +9,11 @@ impl Interpreter {
     /// Constructor for Interpreter.
     pub fn new() -> Self {
         spdlog::debug!("constructing new interpreter.");
+        let globals = Interpreter::get_globals();
+        // App::runtime_error(2, format!("{}", globals.get("__VERSION__")));
         Self {
-            environment: Box::new(Environment::new(None)),
+            environment: globals.clone(),
+            globals,
         }
     }
 

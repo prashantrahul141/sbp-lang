@@ -34,6 +34,7 @@ mod parser {
 
 mod interpreter {
     pub mod environment;
+    pub mod globals;
     pub mod impl_expr_visitor;
     pub mod impl_stmt_visitor;
     pub mod interpreter_main;
