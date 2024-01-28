@@ -1,4 +1,4 @@
-use crate::token::token_main::Token;
+use crate::{parser::error::ParserError, token::token_main::Token};
 
 use super::expr_ast::Expr;
 
@@ -67,7 +67,7 @@ pub struct StmtIf {
     // then branch of if statement.
     pub then_branch: Stmt,
     // else branch of if statement.
-    pub else_branch: Option<Stmt>,
+    pub else_branch: Result<Stmt, ParserError>,
 }
 
 /// Grammer for stmtprint statemments.

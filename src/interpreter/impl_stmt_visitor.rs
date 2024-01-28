@@ -67,7 +67,7 @@ impl StmtVisitor for Interpreter {
         } else {
             spdlog::trace!("checking and executing else branch.");
             // else check if `else_branch` exists on the stmt, and execute it.
-            if let Some(else_branch) = &stmt.else_branch {
+            if let Ok(else_branch) = &stmt.else_branch {
                 self.execute(else_branch);
             }
         }
