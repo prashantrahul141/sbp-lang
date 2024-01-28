@@ -28,6 +28,7 @@ impl Parser {
             return Some(self.advance());
         }
 
+        self.has_error = true;
         let peek = self.peek().clone();
         self.parser_report_error(&peek, message);
         None
@@ -38,7 +39,6 @@ impl Parser {
     /// * `token` - Reference to token which caused error.
     /// * `message` - The error message to show.
     pub fn parser_report_error(&mut self, token: &Token, message: String) {
-        self.has_error = true;
         App::error_token(token.clone(), message);
     }
 
