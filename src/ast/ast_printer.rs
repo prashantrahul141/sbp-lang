@@ -47,4 +47,8 @@ impl ExprVisitor<()> for AstPrinter {
     fn visit_logical_expr(&mut self, expr: &super::expr_ast::ExprLogical) {
         print!("{} {} {}", expr.operator.lexeme, expr.left, expr.right);
     }
+
+    fn visit_call_expr(&mut self, expr: &super::expr_ast::ExprCall) {
+        print!("{}", expr.callee);
+    }
 }

@@ -1,8 +1,16 @@
-use crate::token::token_main::{Token, TokenLiterals};
+use crate::{
+    interpreter::{
+        environment::{self, Environment},
+        interpreter_main::Interpreter,
+    },
+    token::token_main::{Token, TokenLiterals},
+};
+
+use super::stmt_ast::StmtFunc;
 
 /// Base Expression enum.
 /// Holds variants for all types of expressions.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Expr {
     Binary(Box<ExprBinary>),
     Call(Box<ExprCall>),
@@ -53,18 +61,18 @@ pub trait ExprVisitor<T> {
 pub fn walk_expr<T>(visitor: &mut dyn ExprVisitor<T>, expr: &Expr) -> T {
     match expr {
         Expr::Binary(e) => visitor.visit_binary_expr(e),
-        Expr::Call(e) => visitor.visit_call_expr(e),
         Expr::Grouping(e) => visitor.visit_grouping_expr(e),
         Expr::Literal(e) => visitor.visit_literal_expr(e),
         Expr::Unary(e) => visitor.visit_unary_expr(e),
         Expr::Variable(e) => visitor.visit_let_expr(e),
         Expr::Assignment(e) => visitor.visit_assign_expr(e),
         Expr::Logical(e) => visitor.visit_logical_expr(e),
+        Expr::Call(e) => visitor.visit_call_expr(e),
     }
 }
 
 /// Grammer for binary expressions.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExprBinary {
     // left operand.
     pub left: Expr,
@@ -82,7 +90,7 @@ impl std::fmt::Display for ExprBinary {
 }
 
 /// Grammer for grouping expressions.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExprGrouping {
     // grouped expression.
     pub expression: Expr,
@@ -96,7 +104,7 @@ impl std::fmt::Display for ExprGrouping {
 }
 
 /// Grammer for literals.ast
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExprLiteral {
     // token literal.
     pub value: TokenLiterals,
@@ -110,7 +118,7 @@ impl std::fmt::Display for ExprLiteral {
 }
 
 /// Grammer for unary expressions.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExprUnary {
     /// unary operator.
     pub operator: Token,
@@ -126,7 +134,7 @@ impl std::fmt::Display for ExprUnary {
 }
 
 /// Grammer for variable declarations.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExprVariable {
     // name of the variable.
     pub name: Token,
@@ -140,7 +148,7 @@ impl std::fmt::Display for ExprVariable {
 }
 
 /// Grammer for assignment expressions.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExprAssign {
     // name of the variable
     pub name: Token,
@@ -149,7 +157,7 @@ pub struct ExprAssign {
 }
 
 /// Grammer for logical expressions.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExprLogical {
     // left hand of operation.
     pub left: Expr,
@@ -160,7 +168,7 @@ pub struct ExprLogical {
 }
 
 /// Grammer for functions call expressions.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExprCall {
     // function callee
     pub callee: Expr,
@@ -168,4 +176,36 @@ pub struct ExprCall {
     pub paren: Token,
     // right hand of operation.
     pub arguments: Vec<Expr>,
+}
+
+// splax callable.
+pub trait SplaxCallable {
+    fn call(&self, interpreter: &mut Interpreter, arguments: Vec<TokenLiterals>);
+}
+
+#[derive(Debug, Clone)]
+pub struct FunctionObject {
+    pub declaration: StmtFunc,
+}
+
+impl SplaxCallable for FunctionObject {
+    fn call(&self, interpreter: &mut Interpreter, arguments: Vec<TokenLiterals>) {
+        // create new environment for function.
+        let mut environment = Box::new(Environment::new(Some(interpreter.environment.clone())));
+
+        // define function arguments in new environment.
+        for (i, arg) in arguments
+            .iter()
+            .enumerate()
+            .take(self.declaration.params.len())
+        {
+            environment.define(
+                self.declaration.params[i].lexeme.to_string(),
+                environment::SplaxDeclarations::Literals(Box::new(arg.clone())),
+            )
+        }
+
+        // interpret function body.
+        interpreter.execute_block(&self.declaration.body, environment);
+    }
 }
