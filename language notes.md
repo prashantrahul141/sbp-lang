@@ -17,8 +17,15 @@ operator    ->   "==" | "!=" | "<" | "<=" | ">" | ">=" | "+"  | "-"  | "*" | "/"
 ```
 program       ->     declaration* EOF ;
 
-declaration   ->     letDecl
+declaration   ->     fnDecl
+                    | letDecl
                     | statement ;
+
+fnDecl        ->     "fn" function ;
+
+function      ->     IDENTIFIER "(" parameters? ")" block ;
+
+parameters    ->     IDENTIFIER ( "," IDENTIFIER )* ;
 
 letDecl       ->     "let" IDENTIFIER ( "=" expression )? ";" ;
 

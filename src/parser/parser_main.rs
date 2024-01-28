@@ -7,7 +7,7 @@ use crate::{
             Expr, ExprAssign, ExprBinary, ExprCall, ExprGrouping, ExprLiteral, ExprLogical,
             ExprUnary, ExprVariable,
         },
-        stmt_ast::{Stmt, StmtBlock, StmtExpr, StmtIf, StmtLet, StmtPrint, StmtWhile},
+        stmt_ast::{Stmt, StmtBlock, StmtExpr, StmtFunc, StmtIf, StmtLet, StmtPrint, StmtWhile},
     },
     token::{
         self,
@@ -53,6 +53,9 @@ impl Parser {
     /// Parses declarations
     pub fn declaration(&mut self) -> Option<Stmt> {
         spdlog::debug!("parsing a declaration.");
+        if self.match_token(vec![TokenType::Fn]) {
+            return self.fn_declaration();
+        }
         if self.match_token(vec![TokenType::Let]) {
             return self.let_declaration();
         }
@@ -60,7 +63,73 @@ impl Parser {
         self.statement()
     }
 
-    /// Parses let type of declarations
+    /// parses fn type of declarations.
+    pub fn fn_declaration(&mut self) -> Option<Stmt> {
+        let name = match self.consume(TokenType::Identifier, "Expected function name.".to_string())
+        {
+            Some(name) => name,
+            None => return None,
+        }
+        .clone();
+
+        self.consume(
+            TokenType::LeftParen,
+            "Expected '(' after function name.".to_string(),
+        );
+
+        let mut parameters: Vec<Token> = vec![];
+        // if there are parameters.
+        if !self.check(&TokenType::RightParen) {
+            if let Some(param) = self.consume(
+                TokenType::Identifier,
+                "Expected parameter name.".to_string(),
+            ) {
+                parameters.push(param.to_owned());
+            }
+
+            loop {
+                if parameters.len() > 255 {
+                    let peeked = self.peek().to_owned();
+                    self.parser_report_error(
+                        &peeked,
+                        "Can't have more than 255 function parameters.".to_string(),
+                    );
+                }
+
+                if let Some(param) = self.consume(
+                    TokenType::Identifier,
+                    "Expected parameter name.".to_string(),
+                ) {
+                    parameters.push(param.to_owned());
+                }
+                if !self.match_token(vec![TokenType::Comma]) {
+                    break;
+                }
+            }
+        }
+
+        // finnaly consuming closing ')'
+        self.consume(
+            TokenType::RightParen,
+            "Expected ')' after parameters.".to_string(),
+        );
+
+        // now parsing function body
+        self.consume(
+            TokenType::LeftBrace,
+            "Expected '{' after function signature.".to_string(),
+        );
+
+        let body = self.block();
+
+        Some(Stmt::Function(Box::new(StmtFunc {
+            name: name.to_owned(),
+            body,
+            params: parameters,
+        })))
+    }
+
+    /// Parses let type of
     pub fn let_declaration(&mut self) -> Option<Stmt> {
         spdlog::debug!("parsing a Let declaration.");
         let name = match self.consume(TokenType::Identifier, "Expect variable name.".to_string()) {
