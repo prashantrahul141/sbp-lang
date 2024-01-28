@@ -3,10 +3,11 @@ use crate::token::token_main::Token;
 use super::expr_ast::Expr;
 
 /// Top level statements enum.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Stmt {
     Block(Box<StmtBlock>),
     Expr(Box<StmtExpr>),
+    Function(Box<StmtFunc>),
     If(Box<StmtIf>),
     Print(Box<StmtPrint>),
     Let(Box<StmtLet>),
@@ -25,6 +26,7 @@ pub trait StmtVisitor {
     fn visit_let_stmt(&mut self, stmt: &StmtLet);
     fn visit_if_stmt(&mut self, stmt: &StmtIf);
     fn visit_while_stmt(&mut self, stmt: &StmtWhile);
+    fn visit_function_stmt(&mut self, stmt: &StmtFunc);
 }
 
 /// Walker, in other implementation this will be called `accept`.
@@ -39,25 +41,26 @@ pub fn walk_stmt(visitor: &mut dyn StmtVisitor, stmt: &Stmt) {
         Stmt::Let(stmt) => visitor.visit_let_stmt(stmt),
         Stmt::If(stmt) => visitor.visit_if_stmt(stmt),
         Stmt::While(stmt) => visitor.visit_while_stmt(stmt),
+        Stmt::Function(stmt) => visitor.visit_function_stmt(stmt),
     }
 }
 
 /// Grammer for stmtblock statemments.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StmtBlock {
     // the expression itself.
     pub block_statements: Vec<Stmt>,
 }
 
 /// Grammer for stmtexpr statemments.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StmtExpr {
     // the expression itself.
     pub expr: Expr,
 }
 
 /// Grammer for stmtif statemments.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StmtIf {
     // condition of if statement.
     pub condition: Expr,
@@ -68,14 +71,14 @@ pub struct StmtIf {
 }
 
 /// Grammer for stmtprint statemments.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StmtPrint {
     // the expression to evaluate and print.
     pub expr: Expr,
 }
 
 /// Grammer for stmtlet statemments.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StmtLet {
     // name of the binding.
     pub name: Token,
@@ -84,10 +87,21 @@ pub struct StmtLet {
 }
 
 /// Grammer for stmtwhile statemments.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StmtWhile {
     // condition of while statement.
     pub condition: Expr,
     // then branch of while statement.
     pub body: Stmt,
+}
+
+/// Grammer for function declaration.
+#[derive(Debug, Clone)]
+pub struct StmtFunc {
+    // name of the function.
+    pub name: Token,
+    // parameters of the function
+    pub params: Vec<Token>,
+    // function body
+    pub body: StmtBlock,
 }
