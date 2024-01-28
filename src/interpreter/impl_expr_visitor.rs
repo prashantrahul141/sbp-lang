@@ -3,8 +3,9 @@ use crate::{
     app::app_main::App,
     ast::{
         self,
-        expr_ast::{walk_expr, ExprVisitor},
+        expr_ast::{walk_expr, Expr, ExprVisitor, SplaxCallable},
     },
+    interpreter::environment::SplaxDeclarations,
     token::{token_main::TokenLiterals, token_types::TokenType},
 };
 
@@ -15,8 +16,10 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
     /// * `expr` - Binary Expression.
     fn visit_assign_expr(&mut self, expr: &ast::expr_ast::ExprAssign) -> TokenLiterals {
         let value = walk_expr(self, &expr.value);
-        self.environment
-            .assign(expr.name.to_owned(), value.to_owned());
+        self.environment.assign(
+            expr.name.to_owned(),
+            super::environment::SplaxDeclarations::Literals(Box::new(value.to_owned())),
+        );
         value
     }
 
@@ -183,7 +186,12 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
     /// * `expr` - Variable expression.
     fn visit_let_expr(&mut self, expr: &ast::expr_ast::ExprVariable) -> TokenLiterals {
         spdlog::trace!("interpreting variable expression: {:?}", expr);
-        self.environment.get(expr.name.to_owned())
+        match self.environment.get(expr.name.to_owned()) {
+            SplaxDeclarations::Literals(literal) => *literal,
+            SplaxDeclarations::Functions(function) => {
+                TokenLiterals::String(format!("<fn {}>", function.declaration.name))
+            }
+        }
     }
 
     /// Evalute logical expressions.
@@ -210,5 +218,26 @@ impl ExprVisitor<TokenLiterals> for Interpreter {
 
         // if we miss above cases, we also solve the right operand and return that.
         walk_expr(self, &expr.right)
+    }
+
+    fn visit_call_expr(&mut self, expr: &ast::expr_ast::ExprCall) -> TokenLiterals {
+        let callee = expr.callee.clone();
+        let mut arguments = vec![];
+        for arg in &expr.arguments {
+            arguments.push(walk_expr(self, arg))
+        }
+
+        if let Expr::Variable(callee) = callee {
+            if let SplaxDeclarations::Functions(function_body) = self.environment.get(callee.name) {
+                function_body.call(self, arguments);
+                return TokenLiterals::Null;
+            } else {
+                App::runtime_error(expr.paren.line, "Called a non function type.".to_string());
+                panic!();
+            }
+        }
+
+        App::runtime_error(expr.paren.line, "Called a non identifier.".to_string());
+        panic!();
     }
 }
