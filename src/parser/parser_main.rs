@@ -80,12 +80,7 @@ impl Parser {
         let mut parameters: Vec<Token> = vec![];
         // if there are parameters.
         if !self.check(&TokenType::RightParen) {
-            if let Some(param) = self.consume(
-                TokenType::Identifier,
-                "Expected parameter name.".to_string(),
-            ) {
-                parameters.push(param.to_owned());
-            }
+            // rust's way of doing do-while loop.
 
             loop {
                 if parameters.len() > 255 {
@@ -94,14 +89,15 @@ impl Parser {
                         &peeked,
                         "Can't have more than 255 function parameters.".to_string(),
                     );
-                }
+                };
 
                 if let Some(param) = self.consume(
                     TokenType::Identifier,
-                    "Expected parameter name.".to_string(),
+                    "Expected parameter name. ".to_string(),
                 ) {
                     parameters.push(param.to_owned());
-                }
+                };
+
                 if !self.match_token(vec![TokenType::Comma]) {
                     break;
                 }
@@ -124,7 +120,9 @@ impl Parser {
 
         Some(Stmt::Function(Box::new(StmtFunc {
             name: name.to_owned(),
-            body,
+            body: StmtBlock {
+                block_statements: body,
+            },
             params: parameters,
         })))
     }
@@ -589,10 +587,6 @@ impl Parser {
             // if we find right paren.
             if !self.check(&TokenType::RightParen) {
                 // rust way of doing do-while loop.
-                // add arguments.
-                if let Some(argument) = self.expression() {
-                    arguments.push(argument);
-                }
                 loop {
                     if arguments.len() >= 255 {
                         let error_token = &self.tokens[self.current].to_owned();
@@ -601,12 +595,13 @@ impl Parser {
                             "Can't have more than 255 function arguments.".to_string(),
                         )
                     }
+
                     // add arguments.
                     if let Some(argument) = self.expression() {
                         arguments.push(argument);
                     }
                     // if we see a comma we have reached the end of this argument.
-                    if self.match_token(vec![TokenType::Comma]) {
+                    if !self.match_token(vec![TokenType::Comma]) {
                         break;
                     }
                 }
