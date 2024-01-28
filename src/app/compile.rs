@@ -21,7 +21,7 @@ impl App {
         let statements = parser.parse();
 
         if parser.has_error {
-            spdlog::error!("found parsing errrors, terminating execution.");
+            spdlog::error!("Found parsing errrors, terminating execution.");
             return;
         }
 
