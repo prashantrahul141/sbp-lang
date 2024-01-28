@@ -40,7 +40,7 @@ impl Interpreter {
 
         // executing block statements.
         for stmt in &block_statements.block_statements {
-            self.execute(stmt)
+            self.execute(stmt);
         }
 
         // take current's parent environment, clone it and make it current environment

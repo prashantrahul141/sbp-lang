@@ -1,5 +1,12 @@
-use super::{environment::Environment, interpreter_main::Interpreter};
-use crate::ast::{self, expr_ast::walk_expr, stmt_ast::StmtVisitor};
+use super::{
+    environment::{Environment, SplaxDeclarations},
+    interpreter_main::Interpreter,
+};
+use crate::ast::{
+    self,
+    expr_ast::{walk_expr, FunctionObject},
+    stmt_ast::StmtVisitor,
+};
 
 /// Impl StmtVisitor pattern for Interpreter.
 impl StmtVisitor for Interpreter {
@@ -38,7 +45,10 @@ impl StmtVisitor for Interpreter {
             stmt.name.lexeme,
             value
         );
-        self.environment.define(stmt.name.lexeme.to_owned(), value);
+        self.environment.define(
+            stmt.name.lexeme.to_owned(),
+            SplaxDeclarations::Literals(Box::new(value)),
+        );
     }
 
     /// method walks/executes if statements.
@@ -70,5 +80,16 @@ impl StmtVisitor for Interpreter {
         while Interpreter::is_truth(walk_expr(self, &stmt.condition)) {
             self.execute(&stmt.body);
         }
+    }
+
+    fn visit_function_stmt(&mut self, stmt: &ast::stmt_ast::StmtFunc) {
+        let function = FunctionObject {
+            declaration: stmt.clone(),
+        };
+
+        self.environment.define(
+            stmt.name.lexeme.clone(),
+            SplaxDeclarations::Functions(Box::new(function)),
+        );
     }
 }
