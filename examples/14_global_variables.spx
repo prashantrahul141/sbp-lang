@@ -1,0 +1,7 @@
+// 'globals' here refer to interpreter's global variables
+// which are already defined by the language.
+
+
+print __VERSION__;
+
+print __HOMEPAGE__;
