@@ -1,0 +1,10 @@
+fn add(a, b) {
+    print a + b;
+}
+
+fn subtract(a, b){
+    print a - b;
+}
+
+add(1, 2);
+subtract(1, 2);
