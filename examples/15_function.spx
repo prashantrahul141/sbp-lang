@@ -13,6 +13,6 @@ fn print_only_even(n) {
 
 let i = 0;
 while (i < 11) {
-    print_only_odd(i);
+    print_only_even(i);
     i = i + 1;
 }
