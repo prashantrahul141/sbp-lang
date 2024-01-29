@@ -12,6 +12,29 @@ print "Hello, World!";
 ```
 Semi-colons at the end of every line is mandatory in Splax.
 
+### Datatypes
+Splax has following datatypes
+
+#### Numbers
+These can number literals which can be both integers and floating point numbers.
+
+examples: `1`, `2.5`, `9`
+
+#### Strings
+These are string literals defined inside `"`
+
+examples: `"Splax"`, `"Strings are easy"`
+
+### Booleans
+These are boolean literals which can be either `true` or `false`.
+
+examples: `true`, `false`
+
+### Nulls
+Splax has nulls, the trillion dollar mistale. It can be defined using the `null` keyword. All uninitialized variables are given the value of `null`.
+
+examples: `null`
+
 
 
 ### Operators.
@@ -24,23 +47,37 @@ Splax has following operators:
 
 ### Logical operators
 `and` - logical AND
+
 `or`  - logical OR
+
 `!`   - logical NOT
+
 
 #### Arithmetic operators
 `+` - sum
+
 `-` - difference
+
 `*` - product 
+
 `/` - division 
+
 `%` - mod
+
 
 #### Comparison operators
 `==` - is equals
+
 `!=` - is not equals
+
 `>`  - is less than
+
 `>=` - is less than or equals
+
 `>`  - is greater than
+
 `>=` - is greater than or equals
+
 
 
 
@@ -50,7 +87,7 @@ Splax has only one type of comment, single line comments, which can be defined u
 ```c
 // This is a comment.
 // The Lexer completely ignores any line starting with //
-// The Whole line is ignore.
+// The Whole line is ignored.
 ```
 
 ### Variables
@@ -65,9 +102,10 @@ let variable_name = initial_value;
 example:
 ```rust
 let a; // default value is null if nothing is assigned.
-let b = 2;
-let c = "Strings are easy";
-let d = true;
+let b = 2; // numbers: both integers
+let c = 2.5; // and floats
+let d = "Strings are easy"; // strings
+let e = true; // booleans
 ```
 
 
