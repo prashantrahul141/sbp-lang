@@ -5,6 +5,10 @@ Interpreter for Splax, A dynamic programming language I made while learning how 
 ## Splax Language Documentation
 
 
+### File Extension
+Splax supports text files with `spx` file extension.
+example: `main.spx`
+
 ### Hello, world!
 A simple hello world program in splax:
 ```python
@@ -30,7 +34,7 @@ These are boolean literals which can be either `true` or `false`.
 
 examples: `true`, `false`
 
-### Nulls
+### Null
 Splax has nulls, the trillion dollar mistale. It can be defined using the `null` keyword. All uninitialized variables are given the value of `null`.
 
 examples: `null`
@@ -202,9 +206,23 @@ example
 greet("Splax");
 ```
 
-## Usage
+## Using the interpreter
 
-Run the executable for the help message.
+### Running the interpreter on a spx file.
+```sh
+splax run main.spx
+```
+
+### Running the live repl ( doesn't work half of the time )
+```sh
+splax repl
+```
+
+### The help message
+```sh
+splax
+```
+
 ```
 A learning programming language.
 
